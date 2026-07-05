@@ -14,7 +14,7 @@ const ParticipationConfirmationPage = () => {
   const [schools, setSchools] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     school_id: '',
-    series_number: 6,
+    series_number: 1,
     confirmed_by: '',
     number_of_students: '',
     notes: ''
