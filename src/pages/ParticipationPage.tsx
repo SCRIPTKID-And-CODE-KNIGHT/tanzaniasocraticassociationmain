@@ -243,7 +243,7 @@ const ParticipationPage = () => {
                     <Calendar className="h-4 w-4" />
                     <AlertDescription>
                       <strong>Series 1</strong><br />
-                      Confirmation deadline:You are reminded to confirm for prticipation before the confirmation window is closed.
+                      Confirmation deadline: You are reminded to confirm participation before the confirmation window is closed.
                     </AlertDescription>
                   </Alert>
 
@@ -270,21 +270,21 @@ const ParticipationPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-primary">SERIES 6</h4>
+                  <h4 className="font-semibold text-primary">SERIES 1</h4>
                   <p className="text-sm text-muted-foreground">Both Physical & Human Geography Focus</p>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Confirmation Deadline:</span>
-                    <Badge variant="outline">TBA</Badge>
+                    <Badge variant="outline">24 July 2026</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Competition Dates:</span>
-                    <Badge variant="outline">TBA</Badge>
+                    <Badge variant="outline">29–30 July 2026</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Results Release:</span>
-                    <Badge variant="outline">WILL BE PUBLISHED SOON</Badge>
+                    <Badge variant="outline">9 August 2026</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -313,7 +313,7 @@ const ParticipationPage = () => {
                   </div>
                   <div className="flex items-center justify-between p-2 rounded bg-muted/30">
                     <span>Competition Week</span>
-                    <Badge variant="outline">TBA</Badge>
+                    <Badge variant="outline">29–30 July 2026</Badge>
                   </div>
                 </div>
               </CardContent>
