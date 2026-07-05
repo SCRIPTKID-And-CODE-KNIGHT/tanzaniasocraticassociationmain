@@ -32,7 +32,7 @@ interface SeriesSummary {
 const AlmanacPage = () => {
   const [events, setEvents] = useState<AlmanacEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('5');
+  const [activeTab, setActiveTab] = useState('1');
   const { toast } = useToast();
 
   useEffect(() => {
