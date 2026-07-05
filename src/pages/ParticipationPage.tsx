@@ -32,7 +32,7 @@ const ParticipationPage = () => {
     school_id: '',
     contactPerson: '',
     numberOfStudents: '',
-    series_number: 6
+    series_number: 1
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -53,7 +53,7 @@ const ParticipationPage = () => {
             *,
             schools!inner(school_name, region, district)
           `)
-          .eq('series_number', 6)
+          .eq('series_number', 1)
       ]);
 
       if (schoolsResponse.error) throw schoolsResponse.error;
@@ -101,7 +101,7 @@ const ParticipationPage = () => {
 
       toast({
         title: "Participation Confirmed!",
-        description: "Your school's participation has been confirmed for Series 6.",
+        description: "Your school's participation has been confirmed for Series 1.",
       });
 
       setIsSubmitted(true);
@@ -130,7 +130,7 @@ const ParticipationPage = () => {
               </h1>
               <p className="text-muted-foreground mb-6">
                 <strong>{selectedSchool?.school_name}</strong> has been successfully confirmed for participation 
-                in TASSA Socratic Series 6.
+                in TASSA Socratic Series 1.
               </p>
               <div className="bg-card p-4 rounded-lg border mb-6">
                 <h3 className="font-semibold mb-2">Confirmation Details</h3>
@@ -139,7 +139,7 @@ const ParticipationPage = () => {
                   <p><strong>Contact:</strong> {formData.contactPerson}</p>
                   <p><strong>Students:</strong> {formData.numberOfStudents}</p>
                   <p><strong>Location:</strong> {selectedSchool?.district}, {selectedSchool?.region}</p>
-                  <p><strong>Series:</strong> Series 6</p>
+                  <p><strong>Series:</strong> Series 1</p>
                 </div>
               </div>
               <Button 
@@ -149,7 +149,7 @@ const ParticipationPage = () => {
                     school_id: '',
                     contactPerson: '',
                     numberOfStudents: '',
-                    series_number: 6
+                    series_number: 1
                   });
                 }}
                 variant="outline"
@@ -171,7 +171,7 @@ const ParticipationPage = () => {
             Participation Confirmation
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Confirm your participation in TASSA Socratic Series 6. 
+            Confirm your participation in TASSA Socratic Series 1. 
             Only registered schools can confirm participation for this series.
           </p>
         </div>
@@ -242,7 +242,7 @@ const ParticipationPage = () => {
                   <Alert>
                     <Calendar className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Series 6</strong><br />
+                      <strong>Series 1</strong><br />
                       Confirmation deadline:You are reminded to confirm for prticipation before the confirmation window is closed.
                     </AlertDescription>
                   </Alert>
@@ -327,7 +327,7 @@ const ParticipationPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Users className="h-6 w-6 text-primary" />
-                <span>Confirmed Schools for Series 6</span>
+                <span>Confirmed Schools for Series 1</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -351,7 +351,7 @@ const ParticipationPage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 6 yet.</p>
+                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 1 yet.</p>
               )}
             </CardContent>
           </Card>
