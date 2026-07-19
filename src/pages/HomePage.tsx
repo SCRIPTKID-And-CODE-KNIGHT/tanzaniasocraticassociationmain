@@ -30,21 +30,7 @@ const HomePage = () => {
     { icon: FileText, label: 'Past Papers', value: '200+' },
   ];
 
-  const half = Math.ceil(schools.length / 2) || 1;
-  const rowA = schools.slice(0, half);
-  const rowB = schools.slice(half);
-
-  const SchoolPill = ({ name, region }: { name: string; region: string }) => (
-    <div className="mx-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 shadow-sm hover:shadow-md hover:border-primary/40 transition-all">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Building2 className="h-3.5 w-3.5" />
-      </div>
-      <div className="flex flex-col leading-tight whitespace-nowrap">
-        <span className="text-xs font-semibold text-foreground">{name}</span>
-        <span className="text-[10px] text-muted-foreground">{region}</span>
-      </div>
-    </div>
-  );
+  const displaySchools = schools.slice(0, 12);
 
   return (
     <div className="bg-background">
@@ -177,29 +163,20 @@ const HomePage = () => {
           </Reveal>
 
           {schools.length > 0 ? (
-            <div className="space-y-4">
-              {/* Row A - scroll left */}
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
-                <div className="flex animate-scroll-left whitespace-nowrap">
-                  {[...rowA, ...rowA].map((s, i) => (
-                    <SchoolPill key={`a-${s.id}-${i}`} name={s.school_name} region={s.region} />
-                  ))}
-                </div>
-              </div>
-              {/* Row B - scroll right */}
-              {rowB.length > 0 && (
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-                  <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
-                  <div className="flex animate-scroll-right whitespace-nowrap">
-                    {[...rowB, ...rowB].map((s, i) => (
-                      <SchoolPill key={`b-${s.id}-${i}`} name={s.school_name} region={s.region} />
-                    ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {displaySchools.map((s, i) => (
+                <Reveal key={s.id} variant={i % 2 === 0 ? 'left' : 'right'} delay={i * 50}>
+                  <div className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm hover:shadow-lg hover:border-primary/40 hover:-translate-y-0.5 transition-all">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <Building2 className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col leading-tight min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">{s.school_name}</span>
+                      <span className="text-xs text-muted-foreground truncate">{s.region}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                </Reveal>
+              ))}
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">Loading registered schools…</div>

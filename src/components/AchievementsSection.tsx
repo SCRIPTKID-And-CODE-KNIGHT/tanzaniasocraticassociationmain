@@ -76,10 +76,10 @@ const AchievementsSection = () => {
   }
 
   const positionStyle = (pos: number) => {
-    if (pos === 1) return { ring: 'ring-2 ring-warning/60', badge: 'bg-warning text-warning-foreground', icon: Trophy, label: 'Gold' };
-    if (pos === 2) return { ring: 'ring-2 ring-muted-foreground/40', badge: 'bg-muted text-foreground', icon: Medal, label: 'Silver' };
-    if (pos === 3) return { ring: 'ring-2 ring-warning/30', badge: 'bg-warning/30 text-warning-foreground', icon: Award, label: 'Bronze' };
-    return { ring: '', badge: 'bg-primary/10 text-primary', icon: Star, label: '' };
+    if (pos === 1) return { ring: 'ring-2 ring-warning/70', badge: 'bg-warning text-warning-foreground', icon: Trophy, label: 'Gold', header: 'from-warning to-warning/60' };
+    if (pos === 2) return { ring: 'ring-2 ring-muted-foreground/40', badge: 'bg-muted text-foreground', icon: Medal, label: 'Silver', header: 'from-muted-foreground/60 to-muted-foreground/30' };
+    if (pos === 3) return { ring: 'ring-2 ring-warning/40', badge: 'bg-warning/40 text-warning-foreground', icon: Award, label: 'Bronze', header: 'from-warning/60 to-warning/20' };
+    return { ring: '', badge: 'bg-primary/10 text-primary', icon: Star, label: '', header: 'from-primary to-primary/60' };
   };
 
   return (
@@ -121,23 +121,21 @@ const AchievementsSection = () => {
                 const initials = student.student_name.split(' ').map((n) => n[0]).slice(0, 2).join('');
                 return (
                   <Reveal key={student.id} variant="up" delay={i * 70}>
-                    <Card className={`group relative overflow-hidden rounded-2xl border bg-card ${s.ring} hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}>
-                      <div className="absolute inset-x-0 top-0 h-1 bg-[image:var(--gradient-hero)]" />
-                      <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-warning/10 blur-2xl group-hover:bg-warning/20 transition-colors" />
-                      <CardContent className="relative pt-6">
+                    <Card className={`group relative overflow-hidden rounded-2xl border bg-card ${s.ring} hover:shadow-2xl hover:-translate-y-1 transition-all duration-300`}>
+                      <div className={`relative h-16 bg-gradient-to-r ${s.header} flex items-end justify-between px-4 pb-2`}>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-foreground shadow">
+                          <Icon className="h-3.5 w-3.5" /> Rank #{student.position}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/90">Series {student.series_number}</span>
+                      </div>
+                      <CardContent className="relative pt-8">
+                        <div className="absolute -top-8 left-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold text-lg shadow-lg ring-4 ring-card">
+                          {initials}
+                        </div>
                         <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm shadow-md">
-                              {initials}
-                            </div>
-                            <div>
-                              <h4 className="text-base font-bold text-foreground leading-tight">{student.student_name}</h4>
-                              <p className="text-xs text-muted-foreground">Series {student.series_number}</p>
-                            </div>
+                          <div className="pl-20">
+                            <h4 className="text-base font-bold text-foreground leading-tight">{student.student_name}</h4>
                           </div>
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${s.badge}`}>
-                            <Icon className="h-3 w-3" /> #{student.position}
-                          </span>
                         </div>
                         <div className="space-y-1.5 text-sm">
                           <p className="flex items-center gap-2 text-foreground font-medium">
@@ -197,23 +195,19 @@ const AchievementsSection = () => {
                 const Icon = s.icon;
                 return (
                   <Reveal key={school.id} variant="up" delay={i * 70}>
-                    <Card className={`group relative overflow-hidden rounded-2xl border bg-card ${s.ring} hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}>
-                      <div className="absolute inset-x-0 top-0 h-1 bg-[image:var(--gradient-hero)]" />
-                      <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-colors" />
-                      <CardContent className="relative pt-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
-                              <GraduationCap className="h-6 w-6" />
-                            </div>
-                            <div>
-                              <h4 className="text-base font-bold text-foreground leading-tight">{school.school_name}</h4>
-                              <p className="text-xs text-muted-foreground">Series {school.series_number}</p>
-                            </div>
-                          </div>
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${s.badge}`}>
-                            <Icon className="h-3 w-3" /> #{school.position}
-                          </span>
+                    <Card className={`group relative overflow-hidden rounded-2xl border bg-card ${s.ring} hover:shadow-2xl hover:-translate-y-1 transition-all duration-300`}>
+                      <div className={`relative h-16 bg-gradient-to-r ${s.header} flex items-end justify-between px-4 pb-2`}>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-foreground shadow">
+                          <Icon className="h-3.5 w-3.5" /> Rank #{school.position}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/90">Series {school.series_number}</span>
+                      </div>
+                      <CardContent className="relative pt-8">
+                        <div className="absolute -top-8 left-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg ring-4 ring-card">
+                          <GraduationCap className="h-7 w-7" />
+                        </div>
+                        <div className="pl-20 mb-4">
+                          <h4 className="text-base font-bold text-foreground leading-tight">{school.school_name}</h4>
                         </div>
                         <p className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
                           <MapPin className="h-3.5 w-3.5" />
