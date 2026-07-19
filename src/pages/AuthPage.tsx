@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthError } from '@supabase/supabase-js';
@@ -14,6 +14,8 @@ import type { AuthError } from '@supabase/supabase-js';
 const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({
     email: '',
@@ -57,6 +59,30 @@ const AuthPage = () => {
         title: "Login Failed",
         description: error.message || "An error occurred during login",
         variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast({
+        title: 'Reset Link Sent',
+        description: 'Check your email for a password reset link.',
+      });
+      setShowForgot(false);
+    } catch (error: any) {
+      toast({
+        title: 'Reset Failed',
+        description: error.message || 'Could not send reset email',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -131,6 +157,41 @@ const AuthPage = () => {
 
         <Card className="form-section">
           <CardContent className="p-6">
+            {showForgot ? (
+              <form onSubmit={handleForgotSubmit} className="space-y-4">
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(false)}
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back to login
+                </button>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Reset your password</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter your email and we'll send you a link to reset your password.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <div className="relative mt-1">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full btn-educational" disabled={isLoading}>
+                  {isLoading ? 'Sending...' : 'Send Reset Link'}
+                </Button>
+              </form>
+            ) : (
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
@@ -185,6 +246,13 @@ const AuthPage = () => {
                   >
                     {isLoading ? 'Signing In...' : 'Sign In'}
                   </Button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgot(true)}
+                    className="w-full text-center text-sm text-primary hover:underline"
+                  >
+                    Forgot your password?
+                  </button>
                 </form>
               </TabsContent>
 
@@ -272,6 +340,7 @@ const AuthPage = () => {
                 </form>
               </TabsContent>
             </Tabs>
+            )}
           </CardContent>
         </Card>
       </div>
