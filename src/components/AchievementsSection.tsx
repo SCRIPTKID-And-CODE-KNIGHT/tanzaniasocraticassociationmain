@@ -76,10 +76,10 @@ const AchievementsSection = () => {
   }
 
   const positionStyle = (pos: number) => {
-    if (pos === 1) return { ring: 'ring-2 ring-warning/60', badge: 'bg-warning text-warning-foreground', icon: Trophy, label: 'Gold' };
-    if (pos === 2) return { ring: 'ring-2 ring-muted-foreground/40', badge: 'bg-muted text-foreground', icon: Medal, label: 'Silver' };
-    if (pos === 3) return { ring: 'ring-2 ring-warning/30', badge: 'bg-warning/30 text-warning-foreground', icon: Award, label: 'Bronze' };
-    return { ring: '', badge: 'bg-primary/10 text-primary', icon: Star, label: '' };
+    if (pos === 1) return { ring: 'ring-2 ring-warning/70', badge: 'bg-warning text-warning-foreground', icon: Trophy, label: 'Gold', header: 'from-warning to-warning/60' };
+    if (pos === 2) return { ring: 'ring-2 ring-muted-foreground/40', badge: 'bg-muted text-foreground', icon: Medal, label: 'Silver', header: 'from-muted-foreground/60 to-muted-foreground/30' };
+    if (pos === 3) return { ring: 'ring-2 ring-warning/40', badge: 'bg-warning/40 text-warning-foreground', icon: Award, label: 'Bronze', header: 'from-warning/60 to-warning/20' };
+    return { ring: '', badge: 'bg-primary/10 text-primary', icon: Star, label: '', header: 'from-primary to-primary/60' };
   };
 
   return (
