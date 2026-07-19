@@ -163,20 +163,50 @@ const HomePage = () => {
           </Reveal>
 
           {schools.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displaySchools.map((s, i) => (
-                <Reveal key={s.id} variant={i % 2 === 0 ? 'left' : 'right'} delay={i * 50}>
-                  <div className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm hover:shadow-lg hover:border-primary/40 hover:-translate-y-0.5 transition-all">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      <Building2 className="h-5 w-5" />
+            <div className="space-y-4">
+              {/* Row 1 — scrolls left */}
+              <div className="relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+                <div className="flex gap-4 animate-scroll-left w-max">
+                  {[...displaySchools, ...displaySchools].map((s, i) => (
+                    <div
+                      key={`left-${s.id}-${i}`}
+                      className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all w-64 shrink-0"
+                    >
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Building2 className="h-5 w-5" />
+                      </div>
+                      <div className="flex flex-col leading-tight min-w-0">
+                        <span className="text-sm font-semibold text-foreground truncate">{s.school_name}</span>
+                        <span className="text-xs text-muted-foreground truncate">{s.region}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col leading-tight min-w-0">
-                      <span className="text-sm font-semibold text-foreground truncate">{s.school_name}</span>
-                      <span className="text-xs text-muted-foreground truncate">{s.region}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 2 — scrolls right */}
+              <div className="relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+                <div className="flex gap-4 animate-scroll-right w-max">
+                  {[...displaySchools.reverse(), ...displaySchools].map((s, i) => (
+                    <div
+                      key={`right-${s.id}-${i}`}
+                      className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all w-64 shrink-0"
+                    >
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Building2 className="h-5 w-5" />
+                      </div>
+                      <div className="flex flex-col leading-tight min-w-0">
+                        <span className="text-sm font-semibold text-foreground truncate">{s.school_name}</span>
+                        <span className="text-xs text-muted-foreground truncate">{s.region}</span>
+                      </div>
                     </div>
-                  </div>
-                </Reveal>
-              ))}
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">Loading registered schools…</div>
