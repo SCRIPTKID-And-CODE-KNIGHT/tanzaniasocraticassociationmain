@@ -163,29 +163,20 @@ const HomePage = () => {
           </Reveal>
 
           {schools.length > 0 ? (
-            <div className="space-y-4">
-              {/* Row A - scroll left */}
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
-                <div className="flex animate-scroll-left whitespace-nowrap">
-                  {[...rowA, ...rowA].map((s, i) => (
-                    <SchoolPill key={`a-${s.id}-${i}`} name={s.school_name} region={s.region} />
-                  ))}
-                </div>
-              </div>
-              {/* Row B - scroll right */}
-              {rowB.length > 0 && (
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-                  <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
-                  <div className="flex animate-scroll-right whitespace-nowrap">
-                    {[...rowB, ...rowB].map((s, i) => (
-                      <SchoolPill key={`b-${s.id}-${i}`} name={s.school_name} region={s.region} />
-                    ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {displaySchools.map((s, i) => (
+                <Reveal key={s.id} variant={i % 2 === 0 ? 'left' : 'right'} delay={i * 50}>
+                  <div className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm hover:shadow-lg hover:border-primary/40 hover:-translate-y-0.5 transition-all">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <Building2 className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col leading-tight min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">{s.school_name}</span>
+                      <span className="text-xs text-muted-foreground truncate">{s.region}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                </Reveal>
+              ))}
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">Loading registered schools…</div>
