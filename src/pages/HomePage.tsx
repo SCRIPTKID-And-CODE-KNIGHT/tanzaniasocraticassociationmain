@@ -30,21 +30,7 @@ const HomePage = () => {
     { icon: FileText, label: 'Past Papers', value: '200+' },
   ];
 
-  const half = Math.ceil(schools.length / 2) || 1;
-  const rowA = schools.slice(0, half);
-  const rowB = schools.slice(half);
-
-  const SchoolPill = ({ name, region }: { name: string; region: string }) => (
-    <div className="mx-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 shadow-sm hover:shadow-md hover:border-primary/40 transition-all">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Building2 className="h-3.5 w-3.5" />
-      </div>
-      <div className="flex flex-col leading-tight whitespace-nowrap">
-        <span className="text-xs font-semibold text-foreground">{name}</span>
-        <span className="text-[10px] text-muted-foreground">{region}</span>
-      </div>
-    </div>
-  );
+  const displaySchools = schools.slice(0, 12);
 
   return (
     <div className="bg-background">
