@@ -35,6 +35,7 @@ import SecurityLogsPage from './pages/admin/SecurityLogsPage';
 import SecretariatManagementPage from './pages/admin/SecretariatManagementPage';
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,6 +81,7 @@ const App = () => {
               <Route path="/admin/certificates" element={<CertificateGeneratorPage />} />
               <Route path="/admin/secretariat" element={<SecretariatManagementPage />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
               </Routes>
