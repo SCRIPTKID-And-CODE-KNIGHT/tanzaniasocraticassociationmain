@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Users, FileText, Store, DollarSign, BarChart3, LogOut, Settings, Upload, Clock, Calendar, ShieldAlert, Award, Crown } from 'lucide-react';
+import { Shield, Users, FileText, Store, DollarSign, BarChart3, LogOut, Settings, Upload, Clock, Calendar, ShieldAlert, Award, Crown, Radar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -285,6 +285,23 @@ const AdminPage = () => {
           </Card>
 
           {/* Security Logs */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-primary/40" onClick={() => navigate('/admin/soc')}>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Radar className="h-5 w-5 text-primary" />
+                <span>Security Operations Center</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Live threat feed, attack analytics, alerts and log export
+              </p>
+              <Button className="w-full btn-educational">
+                Open SOC Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/security-logs')}>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">

@@ -7,6 +7,7 @@ import { TopNav } from "@/components/TopNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { ContactNoticePopup } from "@/components/ContactNoticePopup";
+import { SecurityTelemetry } from "@/components/SecurityTelemetry";
 import CertificateGeneratorPage from './pages/admin/CertificateGeneratorPage';
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -32,6 +33,7 @@ import SchoolManagementPage from './pages/admin/SchoolManagementPage';
 import ExamSettingsPage from './pages/admin/ExamSettingsPage';
 import AlmanacManagementPage from './pages/admin/AlmanacManagementPage';
 import SecurityLogsPage from './pages/admin/SecurityLogsPage';
+import SecurityOperationsPage from './pages/admin/SecurityOperationsPage';
 import SecretariatManagementPage from './pages/admin/SecretariatManagementPage';
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
@@ -49,6 +51,7 @@ const App = () => {
         <BrowserRouter>
           <div className="flex flex-col min-h-[100dvh] bg-background">
             <ScrollProgress />
+            <SecurityTelemetry />
             <TopNav />
             <ContactNoticePopup />
             <main className="flex flex-1 flex-col">
@@ -78,6 +81,7 @@ const App = () => {
               <Route path="/admin/exam-settings" element={<ExamSettingsPage />} />
               <Route path="/admin/almanac" element={<AlmanacManagementPage />} />
               <Route path="/admin/security-logs" element={<SecurityLogsPage />} />
+              <Route path="/admin/soc" element={<SecurityOperationsPage />} />
               <Route path="/admin/certificates" element={<CertificateGeneratorPage />} />
               <Route path="/admin/secretariat" element={<SecretariatManagementPage />} />
               <Route path="/auth" element={<AuthPage />} />
