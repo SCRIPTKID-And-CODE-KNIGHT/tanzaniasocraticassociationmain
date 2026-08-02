@@ -629,33 +629,51 @@ export type Database = {
       }
       security_logs: {
         Row: {
+          blocked: boolean
+          city: string | null
+          country: string | null
           created_at: string
           details: Json | null
           event_type: string
           id: string
           ip_address: string | null
+          method: string | null
           path: string | null
+          resolved: boolean
           severity: string
+          source: string
           user_agent: string | null
         }
         Insert: {
+          blocked?: boolean
+          city?: string | null
+          country?: string | null
           created_at?: string
           details?: Json | null
           event_type: string
           id?: string
           ip_address?: string | null
+          method?: string | null
           path?: string | null
+          resolved?: boolean
           severity?: string
+          source?: string
           user_agent?: string | null
         }
         Update: {
+          blocked?: boolean
+          city?: string | null
+          country?: string | null
           created_at?: string
           details?: Json | null
           event_type?: string
           id?: string
           ip_address?: string | null
+          method?: string | null
           path?: string | null
+          resolved?: boolean
           severity?: string
+          source?: string
           user_agent?: string | null
         }
         Relationships: []
