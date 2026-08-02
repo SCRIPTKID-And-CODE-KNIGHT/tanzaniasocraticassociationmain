@@ -4,10 +4,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { FileSpreadsheet, Download, Loader2, Check, X, Clock } from "lucide-react";
+import { FileSpreadsheet, Download, Loader2, Check, X, Clock, Trash2, ArrowUpDown } from "lucide-react";
 import { format } from "date-fns";
 
 interface Submission {
@@ -28,6 +39,8 @@ export default function ResultsSubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortDesc, setSortDesc] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -88,6 +101,7 @@ export default function ResultsSubmissionsPage() {
   };
 
   const downloadFile = async (fileUrl: string, fileName: string) => {
+    void fileName;
     try {
       // Extract the file path from the URL
       const urlParts = fileUrl.split('/result-submissions/');
@@ -113,6 +127,39 @@ export default function ResultsSubmissionsPage() {
       });
     }
   };
+
+  const deleteSubmission = async (submission: Submission) => {
+    setDeletingId(submission.id);
+    try {
+      const parts = submission.file_url.split('/result-submissions/');
+      if (parts.length === 2) {
+        await supabase.storage.from('result-submissions').remove([parts[1]]);
+      }
+
+      const { error } = await supabase
+        .from('result_submissions')
+        .delete()
+        .eq('id', submission.id);
+
+      if (error) throw error;
+
+      setSubmissions((prev) => prev.filter((s) => s.id !== submission.id));
+      toast({ title: "Submission deleted", description: `${submission.school_name} submission removed` });
+    } catch (error: any) {
+      toast({
+        title: "Delete failed",
+        description: error.message || "Failed to delete submission",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const sortedSubmissions = [...submissions].sort((a, b) => {
+    const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return sortDesc ? diff : -diff;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -156,10 +203,18 @@ export default function ResultsSubmissionsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>All Submissions ({submissions.length})</CardTitle>
-            <CardDescription>
-              Click on a file to download and review
-            </CardDescription>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle>All Submissions ({submissions.length})</CardTitle>
+                <CardDescription>
+                  Click on a file to download and review
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setSortDesc(!sortDesc)}>
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                {sortDesc ? "Newest first" : "Oldest first"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {submissions.length === 0 ? (
@@ -176,13 +231,13 @@ export default function ResultsSubmissionsPage() {
                       <TableHead>Teacher</TableHead>
                       <TableHead>Series</TableHead>
                       <TableHead>File</TableHead>
-                      <TableHead>Submitted</TableHead>
+                      <TableHead>Date & Time</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {submissions.map((submission) => (
+                    {sortedSubmissions.map((submission) => (
                       <TableRow key={submission.id}>
                         <TableCell className="font-medium">{submission.school_name}</TableCell>
                         <TableCell>
@@ -205,10 +260,16 @@ export default function ResultsSubmissionsPage() {
                           </button>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(submission.created_at), 'MMM d, yyyy HH:mm')}
+                          <div>
+                            <p>{format(new Date(submission.created_at), 'MMM d, yyyy')}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(submission.created_at), 'HH:mm:ss')}
+                            </p>
+                          </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(submission.status)}</TableCell>
                         <TableCell>
+                          <div className="flex items-center gap-2">
                           <Select
                             value={submission.status}
                             onValueChange={(value) => updateStatus(submission.id, value)}
@@ -223,6 +284,36 @@ export default function ResultsSubmissionsPage() {
                               <SelectItem value="rejected">Rejected</SelectItem>
                             </SelectContent>
                           </Select>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                disabled={deletingId === submission.id}
+                              >
+                                {deletingId === submission.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete this submission?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This permanently removes the submission from {submission.school_name} and its uploaded file. This cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteSubmission(submission)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
