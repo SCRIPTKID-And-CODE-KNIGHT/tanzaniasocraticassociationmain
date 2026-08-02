@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.tassa-ai-chat]
 verify_jwt = false
+
+[functions.security-monitor]
+verify_jwt = false
