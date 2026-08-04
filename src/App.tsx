@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TopNav } from "@/components/TopNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScrollProgress } from "@/components/ScrollProgress";
-import { ContactNoticePopup } from "@/components/ContactNoticePopup";
 import { SecurityTelemetry } from "@/components/SecurityTelemetry";
 import CertificateGeneratorPage from './pages/admin/CertificateGeneratorPage';
 import HomePage from "./pages/HomePage";
@@ -53,7 +52,6 @@ const App = () => {
             <ScrollProgress />
             <SecurityTelemetry />
             <TopNav />
-            <ContactNoticePopup />
             <main className="flex flex-1 flex-col">
               <Routes>
               <Route path="/" element={<HomePage />} />

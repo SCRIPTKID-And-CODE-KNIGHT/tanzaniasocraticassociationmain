@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Activity, AlertTriangle, Ban, Bot, Download, Globe, RefreshCw, Search,
-  Shield, ShieldAlert, ShieldCheck, Trash2, XCircle, Radio,
+  Shield, ShieldAlert, ShieldCheck, Trash2, XCircle, Radio, ArrowLeft,
+  Network, ListChecks, Siren,
 } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart,
@@ -231,20 +232,48 @@ export default function SecurityOperationsPage() {
   const PIE_COLORS = ["hsl(var(--destructive))", "hsl(var(--warning))", "hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--muted-foreground))"];
 
   return (
-    <div className="bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <Button variant="outline" onClick={() => navigate("/admin")} className="mb-6">
-          ← Back to Admin Dashboard
-        </Button>
+    <div className="dark min-h-screen bg-background text-foreground">
+      <div className="relative overflow-hidden border-b border-border bg-card/80 px-4 py-3 backdrop-blur-md">
+        <div className="soc-scan-line pointer-events-none absolute inset-x-0 top-0 h-px bg-primary/40" />
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-xs">TS</div>
+            <div>
+              <p className="font-semibold leading-none">TASSA <span className="font-normal text-muted-foreground">ADMIN</span></p>
+              <p className="mt-1 text-[10px] uppercase text-muted-foreground">Secure operations environment</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <span className="flex items-center gap-2 text-success"><span className="h-2 w-2 animate-pulse rounded-full bg-success" /> System nominal</span>
+            <span className="hidden text-muted-foreground sm:inline">AES-256 · LIVE MONITORING</span>
+          </div>
+        </div>
+      </div>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="mx-auto flex max-w-[1500px]">
+        <aside className="hidden w-64 shrink-0 border-r border-border bg-card/40 p-4 lg:flex lg:flex-col">
+          <p className="mb-4 text-[10px] font-bold uppercase text-muted-foreground">Threat intelligence</p>
+          <div className="space-y-1">
+            <Button className="w-full justify-start gap-3" size="sm"><Radio className="h-4 w-4" /> Active Monitors</Button>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground" size="sm" onClick={() => navigate('/admin/security-logs')}><ListChecks className="h-4 w-4" /> Security Logs</Button>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground" size="sm"><Network className="h-4 w-4" /> Network Sources</Button>
+          </div>
+          <div className="mt-8 border border-destructive/30 bg-destructive/5 p-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase text-destructive"><Siren className="h-4 w-4" /> Priority alert</div>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{metrics.critical} unresolved critical incident(s) require review.</p>
+          </div>
+          <Button variant="ghost" onClick={() => navigate('/admin')} className="mt-auto justify-start gap-2 text-muted-foreground"><ArrowLeft className="h-4 w-4" /> Admin Dashboard</Button>
+        </aside>
+
+        <div className="min-w-0 flex-1 px-4 py-6 md:px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 animate-fade-in">
           <div>
             <div className="flex items-center gap-3">
               <ShieldAlert className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold">Security Operations Center</h1>
+              <h1 className="text-2xl font-bold md:text-3xl">Security Operations Center</h1>
             </div>
-            <p className="text-muted-foreground mt-1">
-              Real-time threat detection, attack analytics and incident response for TASSA.
+            <p className="text-muted-foreground mt-1 text-sm">
+              Real-time threat detection, attack analytics and incident response.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -279,7 +308,7 @@ export default function SecurityOperationsPage() {
         )}
 
         {/* Overview */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5 mb-6 animate-fade-in">
           {[
             { label: "Total Requests", value: metrics.total, icon: Activity, tone: "text-primary" },
             { label: "Blocked", value: metrics.blocked, icon: Ban, tone: "text-destructive" },
@@ -287,7 +316,7 @@ export default function SecurityOperationsPage() {
             { label: "Bot Traffic", value: metrics.bots, icon: Bot, tone: "text-muted-foreground" },
             { label: "Unique Sources", value: metrics.uniqueIps, icon: Globe, tone: "text-primary" },
           ].map((m) => (
-            <Card key={m.label}>
+            <Card key={m.label} className="rounded-md border-border bg-card/70 shadow-none transition-colors hover:border-primary/60">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{m.label}</p>
@@ -299,7 +328,7 @@ export default function SecurityOperationsPage() {
           ))}
         </div>
 
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-md border-border bg-card/70 shadow-none">
           <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               {metrics.health === "healthy" ? (
@@ -326,7 +355,7 @@ export default function SecurityOperationsPage() {
 
         {/* Charts */}
         <div className="grid gap-4 lg:grid-cols-3 mb-6">
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 rounded-md border-border bg-card/70 shadow-none">
             <CardHeader>
               <CardTitle>Attack Trends</CardTitle>
               <CardDescription>Requests vs. suspicious activity over the selected window</CardDescription>
@@ -355,7 +384,7 @@ export default function SecurityOperationsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-md border-border bg-card/70 shadow-none">
             <CardHeader>
               <CardTitle>Severity Mix</CardTitle>
               <CardDescription>Distribution of logged events</CardDescription>
@@ -378,7 +407,7 @@ export default function SecurityOperationsPage() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2 mb-6">
-          <Card>
+          <Card className="rounded-md border-border bg-card/70 shadow-none">
             <CardHeader>
               <CardTitle>Top Attack Types</CardTitle>
               <CardDescription>Signature matches detected at the edge</CardDescription>
@@ -400,7 +429,7 @@ export default function SecurityOperationsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-md border-border bg-card/70 shadow-none">
             <CardHeader>
               <CardTitle>Top Sources</CardTitle>
               <CardDescription>Most active networks (IPs are anonymised)</CardDescription>
@@ -431,7 +460,7 @@ export default function SecurityOperationsPage() {
         </div>
 
         {/* Filters + live feed */}
-        <Card>
+        <Card className="rounded-md border-border bg-card/70 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" /> Live Event Feed
@@ -548,6 +577,7 @@ export default function SecurityOperationsPage() {
           Privacy note: source IP addresses are anonymised (last octet / suffix removed) before storage, no request
           bodies or credentials are recorded, and only data required for security incident response is retained.
         </p>
+        </div>
       </div>
     </div>
   );

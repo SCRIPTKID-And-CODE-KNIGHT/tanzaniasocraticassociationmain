@@ -67,11 +67,11 @@ export function TopNav() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[image:var(--gradient-hero)] text-primary-foreground shadow-md">
-      <div className="container mx-auto flex h-14 items-center gap-3 px-3 sm:px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-primary-foreground/10 bg-primary text-primary-foreground shadow-md">
+      <div className="container mx-auto flex h-16 items-center gap-3 px-3 sm:px-4">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground/15">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-primary-foreground/20 bg-primary-foreground/10 transition-colors group-hover:bg-primary-foreground/15">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div className="hidden sm:flex flex-col leading-tight">
@@ -88,7 +88,7 @@ export function TopNav() {
                 <DropdownMenuTrigger asChild>
                   <button
                     className={cn(
-                      "inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-primary-foreground/10",
+                      "relative inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-primary-foreground/10",
                       groupActive(g) && "bg-primary-foreground/15"
                     )}
                   >
@@ -186,22 +186,24 @@ export function TopNav() {
                 <span className="text-sm font-medium">Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] sm:w-[360px] bg-card text-card-foreground p-0 border-l">
-              <div className="flex items-center justify-between px-4 h-14 border-b border-border bg-[image:var(--gradient-hero)] text-primary-foreground">
+            <SheetContent side="right" className="w-[88vw] sm:w-[360px] bg-card text-card-foreground p-0 border-l">
+              <div className="flex items-center justify-between px-4 h-16 border-b border-border bg-primary text-primary-foreground">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-5 w-5" />
                   <span className="font-bold">TASSA Menu</span>
                 </div>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setMobileOpen(false)}
-                  className="p-1 rounded hover:bg-primary-foreground/10"
+                  className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                   aria-label="Close"
                 >
                   <X className="h-5 w-5" />
-                </button>
+                </Button>
               </div>
 
-              <nav className="overflow-y-auto h-[calc(100vh-3.5rem)] py-2">
+              <nav className="overflow-y-auto h-[calc(100dvh-4rem)] py-2">
                 {navGroups.map((g) => (
                   <div key={g.title} className="px-2 py-1">
                     {g.url ? (

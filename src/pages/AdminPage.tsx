@@ -78,10 +78,16 @@ const AdminPage = () => {
               Welcome, {user?.email} | Manage your TASSA platform
             </p>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="flex items-center space-x-2">
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={() => navigate('/admin/soc')} className="gap-2 shadow-educational">
+              <Radar className="h-4 w-4" />
+              <span>Open SOC</span>
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="flex items-center space-x-2">
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
+          </div>
         </div>
 
         {/* Admin Cards */}

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, AlertTriangle, Info, XCircle, RefreshCw, Search, Filter } from "lucide-react";
+import { Shield, AlertTriangle, Info, XCircle, RefreshCw, Search, Filter, Radar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 
@@ -109,13 +109,14 @@ export default function SecurityLogsPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate('/admin')}
-          className="mb-6"
-        >
-          ← Back to Admin Dashboard
-        </Button>
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Button variant="outline" onClick={() => navigate('/admin')}>
+            ← Back to Admin Dashboard
+          </Button>
+          <Button onClick={() => navigate('/admin/soc')} className="gap-2 shadow-educational">
+            <Radar className="h-4 w-4" /> Open Security Operations Center
+          </Button>
+        </div>
 
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
