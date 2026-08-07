@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,12 +8,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, FileSpreadsheet, Loader2, CheckCircle } from "lucide-react";
+import SubmissionDeadlineCountdown, { type SubmissionSetting } from "@/components/SubmissionDeadlineCountdown";
 
 export default function ResultsSubmissionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [deadlineSetting, setDeadlineSetting] = useState<SubmissionSetting | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("submission_settings")
+        .select("id, deadline, is_enabled, block_after_deadline, message")
+        .eq("is_enabled", true)
+        .order("deadline", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data) setDeadlineSetting(data as SubmissionSetting);
+    };
+    load();
+  }, []);
+
+  const isExpired = deadlineSetting
+    ? new Date(deadlineSetting.deadline).getTime() <= Date.now()
+    : false;
+  const isLocked = Boolean(deadlineSetting?.block_after_deadline) && isExpired;
 
   const [formData, setFormData] = useState({
     schoolName: "",
@@ -60,7 +81,16 @@ export default function ResultsSubmissionPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (isLocked) {
+      toast({
+        title: "Submissions closed",
+        description: "The deadline has passed. The system is no longer accepting results.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedFile) {
       toast({
         title: "No file selected",
@@ -184,6 +214,9 @@ export default function ResultsSubmissionPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {deadlineSetting && (
+              <SubmissionDeadlineCountdown setting={deadlineSetting} expired={isExpired} />
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -292,9 +325,9 @@ export default function ResultsSubmissionPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting || isLocked}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? "Submitting..." : "Submit Results"}
+                {isLocked ? "Submissions Closed" : isSubmitting ? "Submitting..." : "Submit Results"}
               </Button>
             </form>
           </CardContent>

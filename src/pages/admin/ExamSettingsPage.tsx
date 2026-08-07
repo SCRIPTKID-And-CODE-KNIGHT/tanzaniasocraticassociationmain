@@ -11,6 +11,7 @@ import { ArrowLeft, Plus, Calendar, Clock, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import SubmissionDeadlineSettings from '@/components/admin/SubmissionDeadlineSettings';
 
 interface ExamSetting {
   id: string;
@@ -189,6 +190,8 @@ const ExamSettingsPage = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Admin Panel
         </Button>
+
+        <SubmissionDeadlineSettings />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
