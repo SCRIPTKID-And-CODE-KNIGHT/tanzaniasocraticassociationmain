@@ -773,6 +773,36 @@ export type Database = {
           },
         ]
       }
+      submission_settings: {
+        Row: {
+          block_after_deadline: boolean
+          created_at: string
+          deadline: string
+          id: string
+          is_enabled: boolean
+          message: string | null
+          updated_at: string
+        }
+        Insert: {
+          block_after_deadline?: boolean
+          created_at?: string
+          deadline: string
+          id?: string
+          is_enabled?: boolean
+          message?: string | null
+          updated_at?: string
+        }
+        Update: {
+          block_after_deadline?: boolean
+          created_at?: string
+          deadline?: string
+          id?: string
+          is_enabled?: boolean
+          message?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       top_students: {
         Row: {
           created_at: string
