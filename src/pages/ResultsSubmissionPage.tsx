@@ -325,9 +325,9 @@ export default function ResultsSubmissionPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting || isLocked}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? "Submitting..." : "Submit Results"}
+                {isLocked ? "Submissions Closed" : isSubmitting ? "Submitting..." : "Submit Results"}
               </Button>
             </form>
           </CardContent>
