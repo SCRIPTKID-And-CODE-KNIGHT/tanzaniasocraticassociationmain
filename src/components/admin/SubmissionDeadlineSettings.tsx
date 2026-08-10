@@ -94,7 +94,9 @@ export const SubmissionDeadlineSettings = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: checked ? "Countdown activated" : "Countdown turned off" });
+      toast({
+        title: checked ? "Submissions are now OPEN" : "Submissions are now CLOSED",
+      });
       load();
     }
   };
@@ -115,18 +117,20 @@ export const SubmissionDeadlineSettings = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Hourglass className="h-6 w-6 text-primary" />
-          Results Submission Deadline
+          Results Submission Control
         </CardTitle>
         <CardDescription>
-          Show a countdown on the results submission form and stop accepting results after the deadline.
+          Master switch stored in the database: when ON the system accepts submitted results and shows a countdown; when OFF no results are accepted.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={save} className="space-y-4">
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
-              <Label htmlFor="sd_enabled">Countdown active</Label>
-              <p className="text-xs text-muted-foreground">Turn the countdown on or off instantly.</p>
+              <Label htmlFor="sd_enabled">Accept result submissions</Label>
+              <p className="text-xs text-muted-foreground">
+                ON = results accepted (countdown shown). OFF = submissions closed immediately.
+              </p>
             </div>
             <Switch id="sd_enabled" checked={form.is_enabled} onCheckedChange={toggleEnabled} />
           </div>
