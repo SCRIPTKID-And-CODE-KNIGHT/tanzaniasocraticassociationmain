@@ -38,6 +38,11 @@ export const SubmissionDeadlineCountdown = ({ setting, expired }: Props) => {
   });
 
   if (expired) {
+    const closedReason = !setting.is_enabled
+      ? setting.message ||
+        "Result submissions are currently turned off by the administrator."
+      : setting.message ||
+        `The system stopped accepting results on ${dateLabel}. Please contact the secretariat for assistance.`;
     return (
       <Card className="border-destructive/40 bg-destructive/10 p-5 mb-6">
         <div className="flex items-start gap-3">
@@ -45,8 +50,7 @@ export const SubmissionDeadlineCountdown = ({ setting, expired }: Props) => {
           <div>
             <p className="font-semibold text-destructive">Submissions are closed</p>
             <p className="text-sm text-muted-foreground mt-1">
-              {setting.message ||
-                `The system stopped accepting results on ${dateLabel}. Please contact the secretariat for assistance.`}
+              {closedReason}
             </p>
           </div>
         </div>

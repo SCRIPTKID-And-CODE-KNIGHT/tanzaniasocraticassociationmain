@@ -22,8 +22,7 @@ export default function ResultsSubmissionPage() {
       const { data } = await supabase
         .from("submission_settings")
         .select("id, deadline, is_enabled, block_after_deadline, message")
-        .eq("is_enabled", true)
-        .order("deadline", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (data) setDeadlineSetting(data as SubmissionSetting);
@@ -31,10 +30,15 @@ export default function ResultsSubmissionPage() {
     load();
   }, []);
 
-  const isExpired = deadlineSetting
+  // is_enabled is the master switch: OFF = submissions closed entirely
+  const acceptingEnabled = deadlineSetting ? deadlineSetting.is_enabled : true;
+  const deadlinePassed = deadlineSetting
     ? new Date(deadlineSetting.deadline).getTime() <= Date.now()
     : false;
-  const isLocked = Boolean(deadlineSetting?.block_after_deadline) && isExpired;
+  const isLocked =
+    !acceptingEnabled ||
+    (Boolean(deadlineSetting?.block_after_deadline) && deadlinePassed);
+  const isExpired = !acceptingEnabled || deadlinePassed;
 
   const [formData, setFormData] = useState({
     schoolName: "",
