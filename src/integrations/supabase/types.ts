@@ -881,6 +881,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      submissions_open: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
