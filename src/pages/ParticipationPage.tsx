@@ -254,8 +254,8 @@ const ParticipationPage = () => {
                   <Alert>
                     <Calendar className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Series 1</strong><br />
-                      Confirmation deadline: You are reminded to confirm participation before the confirmation window is closed.
+                      <strong>Series 2 — 21 &amp; 24 August 2026</strong><br />
+                      Teachers should confirm early so that materials and student lists are prepared on time.
                     </AlertDescription>
                   </Alert>
 
@@ -270,67 +270,6 @@ const ParticipationPage = () => {
               </CardContent>
             </Card>
           </div>
-
-          <div className="lg:col-span-1 space-y-6">
-            {/* Series Information */}
-            <Card className="form-section">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-6 w-6 text-primary" />
-                  <span>Series Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-primary">SERIES 1</h4>
-                  <p className="text-sm text-muted-foreground">Both Physical & Human Geography Focus</p>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Confirmation Deadline:</span>
-                    <Badge variant="outline">24 July 2026</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Competition Dates:</span>
-                    <Badge variant="outline">29–30 July 2026</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Results Release:</span>
-                    <Badge variant="outline">9 August 2026</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="form-section">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Clock className="h-6 w-6 text-primary" />
-                  <span>Important Dates</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Registration Opens</span>
-                    <Badge className="bg-success text-success-foreground">Completed</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-warning-light/20">
-                    <span>Participation Confirmation</span>
-                    <Badge className="bg-warning text-warning-foreground">Open Now</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Results Release</span>
-                    <Badge variant="outline">After Marking and Results compilation</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Competition Week</span>
-                    <Badge variant="outline">29–30 July 2026</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Confirmed Schools List */}
@@ -339,7 +278,7 @@ const ParticipationPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Users className="h-6 w-6 text-primary" />
-                <span>Confirmed Schools for Series 1</span>
+                <span>Confirmed Schools for Series 2</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
