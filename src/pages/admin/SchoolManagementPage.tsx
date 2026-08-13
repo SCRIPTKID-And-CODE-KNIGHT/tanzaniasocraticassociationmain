@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import ParticipationConfirmationsManager from '@/components/admin/ParticipationConfirmationsManager';
 
 interface SchoolData {
   id: string;
@@ -698,6 +699,8 @@ const SchoolManagementPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        <ParticipationConfirmationsManager />
 
         {/* Delete confirm */}
         <AlertDialog open={!!confirmDeleteId} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>

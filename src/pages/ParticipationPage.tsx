@@ -32,7 +32,7 @@ const ParticipationPage = () => {
     school_id: '',
     contactPerson: '',
     numberOfStudents: '',
-    series_number: 1
+    series_number: 2
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -53,7 +53,7 @@ const ParticipationPage = () => {
             *,
             schools!inner(school_name, region, district)
           `)
-          .eq('series_number', 1)
+          .eq('series_number', 2)
       ]);
 
       if (schoolsResponse.error) throw schoolsResponse.error;
@@ -101,7 +101,7 @@ const ParticipationPage = () => {
 
       toast({
         title: "Participation Confirmed!",
-        description: "Your school's participation has been confirmed for Series 1.",
+        description: "Your school's participation has been confirmed for Series 2.",
       });
 
       setIsSubmitted(true);
@@ -130,7 +130,7 @@ const ParticipationPage = () => {
               </h1>
               <p className="text-muted-foreground mb-6">
                 <strong>{selectedSchool?.school_name}</strong> has been successfully confirmed for participation 
-                in TASSA Socratic Series 1.
+                in TASSA Socratic Series 2 (21 & 24 August 2026).
               </p>
               <div className="bg-card p-4 rounded-lg border mb-6">
                 <h3 className="font-semibold mb-2">Confirmation Details</h3>
@@ -139,7 +139,7 @@ const ParticipationPage = () => {
                   <p><strong>Contact:</strong> {formData.contactPerson}</p>
                   <p><strong>Students:</strong> {formData.numberOfStudents}</p>
                   <p><strong>Location:</strong> {selectedSchool?.district}, {selectedSchool?.region}</p>
-                  <p><strong>Series:</strong> Series 1</p>
+                  <p><strong>Series:</strong> Series 2 — 21 & 24 August 2026</p>
                 </div>
               </div>
               <Button 
@@ -149,7 +149,7 @@ const ParticipationPage = () => {
                     school_id: '',
                     contactPerson: '',
                     numberOfStudents: '',
-                    series_number: 1
+                    series_number: 2
                   });
                 }}
                 variant="outline"
@@ -165,19 +165,31 @@ const ParticipationPage = () => {
 
   return (
     <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-4">
-            Participation Confirmation
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Modern hero */}
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-8 mb-8 text-center">
+          <Badge className="mb-3">Series 2 · August 2026</Badge>
+          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-3">
+            Confirm Participation for Series 2
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Confirm your participation in TASSA Socratic Series 1. 
-            Only registered schools can confirm participation for this series.
+            The next Socratic Series will be held on <strong>21 and 24 August 2026</strong>.
+            Teachers are encouraged to start confirming their schools now.
           </p>
+          <div className="flex flex-wrap justify-center gap-3 mt-5">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm">
+              <Calendar className="h-4 w-4 text-primary" />
+              <span className="font-medium">Exam days: 21 &amp; 24 August 2026</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="font-medium">Confirmation open now</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-8">
+          <div>
             <Card className="form-section">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -242,8 +254,8 @@ const ParticipationPage = () => {
                   <Alert>
                     <Calendar className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Series 1</strong><br />
-                      Confirmation deadline: You are reminded to confirm participation before the confirmation window is closed.
+                      <strong>Series 2 — 21 &amp; 24 August 2026</strong><br />
+                      Teachers should confirm early so that materials and student lists are prepared on time.
                     </AlertDescription>
                   </Alert>
 
@@ -258,67 +270,6 @@ const ParticipationPage = () => {
               </CardContent>
             </Card>
           </div>
-
-          <div className="lg:col-span-1 space-y-6">
-            {/* Series Information */}
-            <Card className="form-section">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-6 w-6 text-primary" />
-                  <span>Series Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-primary">SERIES 1</h4>
-                  <p className="text-sm text-muted-foreground">Both Physical & Human Geography Focus</p>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Confirmation Deadline:</span>
-                    <Badge variant="outline">24 July 2026</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Competition Dates:</span>
-                    <Badge variant="outline">29–30 July 2026</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Results Release:</span>
-                    <Badge variant="outline">9 August 2026</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="form-section">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Clock className="h-6 w-6 text-primary" />
-                  <span>Important Dates</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Registration Opens</span>
-                    <Badge className="bg-success text-success-foreground">Completed</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-warning-light/20">
-                    <span>Participation Confirmation</span>
-                    <Badge className="bg-warning text-warning-foreground">Open Now</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Results Release</span>
-                    <Badge variant="outline">After Marking and Results compilation</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded bg-muted/30">
-                    <span>Competition Week</span>
-                    <Badge variant="outline">29–30 July 2026</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Confirmed Schools List */}
@@ -327,7 +278,7 @@ const ParticipationPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Users className="h-6 w-6 text-primary" />
-                <span>Confirmed Schools for Series 1</span>
+                <span>Confirmed Schools for Series 2</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -351,7 +302,7 @@ const ParticipationPage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 1 yet.</p>
+                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 2 yet.</p>
               )}
             </CardContent>
           </Card>

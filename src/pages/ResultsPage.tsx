@@ -77,7 +77,7 @@ const SchoolsResultsPage = () => {
   const [schools, setSchools] = useState<any[]>([]);
   const [generalResults, setGeneralResults] = useState<GeneralResults | null>(null);
   const [schoolResult, setSchoolResult] = useState<SchoolResult | null>(null);
-  const [currentSeries, setCurrentSeries] = useState(5);
+  const [currentSeries, setCurrentSeries] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState<string>('all');
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
@@ -198,6 +198,24 @@ const SchoolsResultsPage = () => {
             Browse general results, top performers, and individual school reports.
           </p>
         </div>
+
+        {/* Series 1 notice */}
+        <Card className="mb-8 border-primary/30 bg-primary/5 animate-fade-in">
+          <CardContent className="py-6 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
+              <Trophy className="h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">
+                Series 1 results — releasing soon
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                The Series 1 competition conducted in August has been completed. Marking and results
+                compilation is ongoing, and the official results will be released soon on this page.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Filter Bar */}
         <Card className="mb-8 animate-fade-in">
