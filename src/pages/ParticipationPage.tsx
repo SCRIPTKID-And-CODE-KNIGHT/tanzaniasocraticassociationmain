@@ -165,19 +165,31 @@ const ParticipationPage = () => {
 
   return (
     <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-4">
-            Participation Confirmation
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Modern hero */}
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-8 mb-8 text-center">
+          <Badge className="mb-3">Series 2 · August 2026</Badge>
+          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-3">
+            Confirm Participation for Series 2
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Confirm your participation in TASSA Socratic Series 1. 
-            Only registered schools can confirm participation for this series.
+            The next Socratic Series will be held on <strong>21 and 24 August 2026</strong>.
+            Teachers are encouraged to start confirming their schools now.
           </p>
+          <div className="flex flex-wrap justify-center gap-3 mt-5">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm">
+              <Calendar className="h-4 w-4 text-primary" />
+              <span className="font-medium">Exam days: 21 &amp; 24 August 2026</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="font-medium">Confirmation open now</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-8">
+          <div>
             <Card className="form-section">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
