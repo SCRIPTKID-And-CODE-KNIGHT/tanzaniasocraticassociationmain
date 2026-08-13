@@ -32,7 +32,7 @@ const ParticipationPage = () => {
     school_id: '',
     contactPerson: '',
     numberOfStudents: '',
-    series_number: 1
+    series_number: 2
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -53,7 +53,7 @@ const ParticipationPage = () => {
             *,
             schools!inner(school_name, region, district)
           `)
-          .eq('series_number', 1)
+          .eq('series_number', 2)
       ]);
 
       if (schoolsResponse.error) throw schoolsResponse.error;
@@ -101,7 +101,7 @@ const ParticipationPage = () => {
 
       toast({
         title: "Participation Confirmed!",
-        description: "Your school's participation has been confirmed for Series 1.",
+        description: "Your school's participation has been confirmed for Series 2.",
       });
 
       setIsSubmitted(true);
@@ -130,7 +130,7 @@ const ParticipationPage = () => {
               </h1>
               <p className="text-muted-foreground mb-6">
                 <strong>{selectedSchool?.school_name}</strong> has been successfully confirmed for participation 
-                in TASSA Socratic Series 1.
+                in TASSA Socratic Series 2 (21 & 24 August 2026).
               </p>
               <div className="bg-card p-4 rounded-lg border mb-6">
                 <h3 className="font-semibold mb-2">Confirmation Details</h3>
@@ -139,7 +139,7 @@ const ParticipationPage = () => {
                   <p><strong>Contact:</strong> {formData.contactPerson}</p>
                   <p><strong>Students:</strong> {formData.numberOfStudents}</p>
                   <p><strong>Location:</strong> {selectedSchool?.district}, {selectedSchool?.region}</p>
-                  <p><strong>Series:</strong> Series 1</p>
+                  <p><strong>Series:</strong> Series 2 — 21 & 24 August 2026</p>
                 </div>
               </div>
               <Button 
@@ -149,7 +149,7 @@ const ParticipationPage = () => {
                     school_id: '',
                     contactPerson: '',
                     numberOfStudents: '',
-                    series_number: 1
+                    series_number: 2
                   });
                 }}
                 variant="outline"
