@@ -302,7 +302,7 @@ const ParticipationPage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 1 yet.</p>
+                <p className="text-sm text-muted-foreground text-center">No schools have confirmed for Series 2 yet.</p>
               )}
             </CardContent>
           </Card>
