@@ -5,10 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, FileSpreadsheet, Loader2, CheckCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, Loader2, CheckCircle, Plus, Trash2, Table2 } from "lucide-react";
 import SubmissionDeadlineCountdown, { type SubmissionSetting } from "@/components/SubmissionDeadlineCountdown";
+
+interface ResultRow {
+  student_name: string;
+  subject: string;
+  marks: string;
+  grade: string;
+}
+
+const emptyRow = (): ResultRow => ({ student_name: "", subject: "", marks: "", grade: "" });
+
+const gradeFor = (marks: string) => {
+  const n = Number(marks);
+  if (!marks || Number.isNaN(n)) return "";
+  if (n >= 80) return "A";
+  if (n >= 65) return "B";
+  if (n >= 50) return "C";
+  if (n >= 35) return "D";
+  return "F";
+};
+
 
 export default function ResultsSubmissionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
