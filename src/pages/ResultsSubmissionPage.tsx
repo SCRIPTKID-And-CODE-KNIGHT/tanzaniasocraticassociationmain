@@ -356,33 +356,121 @@ export default function ResultsSubmissionPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="file">Results File *</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
-                  <input
-                    id="file"
-                    type="file"
-                    accept=".xlsx,.xls,.csv,.pdf,.doc,.docx"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <label htmlFor="file" className="cursor-pointer">
-                    <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    {selectedFile ? (
-                      <p className="text-sm text-foreground font-medium">{selectedFile.name}</p>
-                    ) : (
-                      <>
-                        <p className="text-sm text-muted-foreground">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Excel, PDF, Word, or CSV (max 10MB)
-                        </p>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
+              <Tabs value={mode} onValueChange={(v) => setMode(v as "upload" | "typed")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload">
+                    <Upload className="h-4 w-4 mr-2" /> Upload file
+                  </TabsTrigger>
+                  <TabsTrigger value="typed">
+                    <Table2 className="h-4 w-4 mr-2" /> Enter results
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="upload" className="space-y-2 mt-4">
+                  <Label htmlFor="file">Results File *</Label>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                    <input
+                      id="file"
+                      type="file"
+                      accept=".xlsx,.xls,.csv,.pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <label htmlFor="file" className="cursor-pointer">
+                      <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                      {selectedFile ? (
+                        <p className="text-sm text-foreground font-medium">{selectedFile.name}</p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Excel, PDF, Word, or CSV (max 10MB)
+                          </p>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="typed" className="space-y-3 mt-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Student Results *</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Tip: copy rows from Excel and paste into the first cell
+                    </p>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="p-2 text-left w-8">#</th>
+                          <th className="p-2 text-left">Student Name</th>
+                          <th className="p-2 text-left">Subject</th>
+                          <th className="p-2 text-left w-24">Marks</th>
+                          <th className="p-2 text-left w-24">Grade</th>
+                          <th className="p-2 w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row, index) => (
+                          <tr key={index} className="border-t border-border">
+                            <td className="p-2 text-muted-foreground">{index + 1}</td>
+                            <td className="p-1">
+                              <Input
+                                value={row.student_name}
+                                onChange={(e) => updateRow(index, "student_name", e.target.value)}
+                                onPaste={(e) => handlePaste(e, index)}
+                                placeholder="Full name"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                value={row.subject}
+                                onChange={(e) => updateRow(index, "subject", e.target.value)}
+                                placeholder="Geography"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                type="number"
+                                value={row.marks}
+                                onChange={(e) => updateRow(index, "marks", e.target.value)}
+                                placeholder="0"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                value={row.grade}
+                                onChange={(e) => updateRow(index, "grade", e.target.value)}
+                                placeholder={gradeFor(row.marks) || "-"}
+                              />
+                            </td>
+                            <td className="p-1 text-center">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeRow(index)}
+                                disabled={rows.length === 1}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <Button type="button" variant="outline" size="sm" onClick={addRow}>
+                    <Plus className="h-4 w-4 mr-2" /> Add row
+                  </Button>
+                </TabsContent>
+              </Tabs>
+
 
               <div className="space-y-2">
                 <Label htmlFor="notes">Additional Notes (Optional)</Label>
