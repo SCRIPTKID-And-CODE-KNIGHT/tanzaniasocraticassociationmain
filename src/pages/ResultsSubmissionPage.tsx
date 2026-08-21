@@ -243,6 +243,8 @@ export default function ResultsSubmissionPage() {
               <Button onClick={() => {
                 setIsSuccess(false);
                 setSelectedFile(null);
+                setRows([emptyRow(), emptyRow(), emptyRow()]);
+
                 setFormData({
                   schoolName: "",
                   teacherName: "",
