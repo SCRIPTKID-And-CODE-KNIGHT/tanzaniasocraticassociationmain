@@ -434,17 +434,59 @@ export type Database = {
           },
         ]
       }
+      result_submission_rows: {
+        Row: {
+          created_at: string
+          grade: string | null
+          id: string
+          marks: number | null
+          position: number | null
+          student_name: string
+          subject: string | null
+          submission_id: string
+        }
+        Insert: {
+          created_at?: string
+          grade?: string | null
+          id?: string
+          marks?: number | null
+          position?: number | null
+          student_name: string
+          subject?: string | null
+          submission_id: string
+        }
+        Update: {
+          created_at?: string
+          grade?: string | null
+          id?: string
+          marks?: number | null
+          position?: number | null
+          student_name?: string
+          subject?: string | null
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "result_submission_rows_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "result_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       result_submissions: {
         Row: {
           created_at: string
-          file_name: string
-          file_url: string
+          file_name: string | null
+          file_url: string | null
           id: string
           notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           school_name: string
           series_number: number
+          source: string
           status: string | null
           teacher_email: string | null
           teacher_name: string
@@ -453,14 +495,15 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          file_name: string
-          file_url: string
+          file_name?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           school_name: string
           series_number: number
+          source?: string
           status?: string | null
           teacher_email?: string | null
           teacher_name: string
@@ -469,14 +512,15 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          file_name?: string
-          file_url?: string
+          file_name?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           school_name?: string
           series_number?: number
+          source?: string
           status?: string | null
           teacher_email?: string | null
           teacher_name?: string

@@ -5,15 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, FileSpreadsheet, Loader2, CheckCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, Loader2, CheckCircle, Plus, Trash2, Table2 } from "lucide-react";
 import SubmissionDeadlineCountdown, { type SubmissionSetting } from "@/components/SubmissionDeadlineCountdown";
+
+interface ResultRow {
+  student_name: string;
+  subject: string;
+  marks: string;
+  grade: string;
+}
+
+const emptyRow = (): ResultRow => ({ student_name: "", subject: "", marks: "", grade: "" });
+
+const gradeFor = (marks: string) => {
+  const n = Number(marks);
+  if (!marks || Number.isNaN(n)) return "";
+  if (n >= 80) return "A";
+  if (n >= 65) return "B";
+  if (n >= 50) return "C";
+  if (n >= 35) return "D";
+  return "F";
+};
+
 
 export default function ResultsSubmissionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [mode, setMode] = useState<"upload" | "typed">("upload");
+  const [rows, setRows] = useState<ResultRow[]>([emptyRow(), emptyRow(), emptyRow()]);
+
   const [deadlineSetting, setDeadlineSetting] = useState<SubmissionSetting | null>(null);
   const { toast } = useToast();
 
@@ -95,10 +119,21 @@ export default function ResultsSubmissionPage() {
       return;
     }
 
-    if (!selectedFile) {
+    const filledRows = rows.filter((r) => r.student_name.trim() !== "");
+
+    if (mode === "upload" && !selectedFile) {
       toast({
         title: "No file selected",
         description: "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (mode === "typed" && filledRows.length === 0) {
+      toast({
+        title: "No results entered",
+        description: "Add at least one student row before submitting",
         variant: "destructive",
       });
       return;
@@ -116,23 +151,31 @@ export default function ResultsSubmissionPage() {
     setIsSubmitting(true);
 
     try {
-      // Upload file to storage
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${formData.schoolName.replace(/\s+/g, '_')}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('result-submissions')
-        .upload(fileName, selectedFile);
+      let fileUrl: string | null = null;
+      let fileNameValue: string | null = null;
 
-      if (uploadError) throw uploadError;
+      if (mode === "upload" && selectedFile) {
+        // Upload file to storage
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${formData.schoolName.replace(/\s+/g, '_')}.${fileExt}`;
 
-      // Get file URL
-      const { data: urlData } = supabase.storage
-        .from('result-submissions')
-        .getPublicUrl(fileName);
+        const { error: uploadError } = await supabase.storage
+          .from('result-submissions')
+          .upload(fileName, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        // Get file URL
+        const { data: urlData } = supabase.storage
+          .from('result-submissions')
+          .getPublicUrl(fileName);
+
+        fileUrl = urlData.publicUrl;
+        fileNameValue = selectedFile.name;
+      }
 
       // Save submission record
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('result_submissions')
         .insert({
           school_name: formData.schoolName,
@@ -140,12 +183,33 @@ export default function ResultsSubmissionPage() {
           teacher_email: formData.teacherEmail || null,
           teacher_phone: formData.teacherPhone,
           series_number: parseInt(formData.seriesNumber),
-          file_url: urlData.publicUrl,
-          file_name: selectedFile.name,
+          file_url: fileUrl,
+          file_name: fileNameValue,
+          source: mode,
           notes: formData.notes || null,
-        });
+        })
+        .select('id')
+        .single();
 
       if (insertError) throw insertError;
+
+      if (mode === "typed" && inserted) {
+        const { error: rowsError } = await supabase
+          .from('result_submission_rows')
+          .insert(
+            filledRows.map((r, index) => ({
+              submission_id: inserted.id,
+              student_name: r.student_name.trim(),
+              subject: r.subject.trim() || null,
+              marks: r.marks === "" ? null : Number(r.marks),
+              grade: r.grade.trim() || gradeFor(r.marks) || null,
+              position: index + 1,
+            }))
+          );
+        if (rowsError) throw rowsError;
+      }
+
+
 
       setIsSuccess(true);
       toast({
@@ -179,6 +243,8 @@ export default function ResultsSubmissionPage() {
               <Button onClick={() => {
                 setIsSuccess(false);
                 setSelectedFile(null);
+                setRows([emptyRow(), emptyRow(), emptyRow()]);
+
                 setFormData({
                   schoolName: "",
                   teacherName: "",
@@ -290,33 +356,121 @@ export default function ResultsSubmissionPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="file">Results File *</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
-                  <input
-                    id="file"
-                    type="file"
-                    accept=".xlsx,.xls,.csv,.pdf,.doc,.docx"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <label htmlFor="file" className="cursor-pointer">
-                    <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    {selectedFile ? (
-                      <p className="text-sm text-foreground font-medium">{selectedFile.name}</p>
-                    ) : (
-                      <>
-                        <p className="text-sm text-muted-foreground">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Excel, PDF, Word, or CSV (max 10MB)
-                        </p>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
+              <Tabs value={mode} onValueChange={(v) => setMode(v as "upload" | "typed")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload">
+                    <Upload className="h-4 w-4 mr-2" /> Upload file
+                  </TabsTrigger>
+                  <TabsTrigger value="typed">
+                    <Table2 className="h-4 w-4 mr-2" /> Enter results
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="upload" className="space-y-2 mt-4">
+                  <Label htmlFor="file">Results File *</Label>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                    <input
+                      id="file"
+                      type="file"
+                      accept=".xlsx,.xls,.csv,.pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <label htmlFor="file" className="cursor-pointer">
+                      <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                      {selectedFile ? (
+                        <p className="text-sm text-foreground font-medium">{selectedFile.name}</p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Excel, PDF, Word, or CSV (max 10MB)
+                          </p>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="typed" className="space-y-3 mt-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Student Results *</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Tip: copy rows from Excel and paste into the first cell
+                    </p>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="p-2 text-left w-8">#</th>
+                          <th className="p-2 text-left">Student Name</th>
+                          <th className="p-2 text-left">Subject</th>
+                          <th className="p-2 text-left w-24">Marks</th>
+                          <th className="p-2 text-left w-24">Grade</th>
+                          <th className="p-2 w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row, index) => (
+                          <tr key={index} className="border-t border-border">
+                            <td className="p-2 text-muted-foreground">{index + 1}</td>
+                            <td className="p-1">
+                              <Input
+                                value={row.student_name}
+                                onChange={(e) => updateRow(index, "student_name", e.target.value)}
+                                onPaste={(e) => handlePaste(e, index)}
+                                placeholder="Full name"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                value={row.subject}
+                                onChange={(e) => updateRow(index, "subject", e.target.value)}
+                                placeholder="Geography"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                type="number"
+                                value={row.marks}
+                                onChange={(e) => updateRow(index, "marks", e.target.value)}
+                                placeholder="0"
+                              />
+                            </td>
+                            <td className="p-1">
+                              <Input
+                                value={row.grade}
+                                onChange={(e) => updateRow(index, "grade", e.target.value)}
+                                placeholder={gradeFor(row.marks) || "-"}
+                              />
+                            </td>
+                            <td className="p-1 text-center">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeRow(index)}
+                                disabled={rows.length === 1}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <Button type="button" variant="outline" size="sm" onClick={addRow}>
+                    <Plus className="h-4 w-4 mr-2" /> Add row
+                  </Button>
+                </TabsContent>
+              </Tabs>
+
 
               <div className="space-y-2">
                 <Label htmlFor="notes">Additional Notes (Optional)</Label>
