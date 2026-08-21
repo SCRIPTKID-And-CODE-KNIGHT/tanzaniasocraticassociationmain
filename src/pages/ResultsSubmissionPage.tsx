@@ -35,6 +35,9 @@ export default function ResultsSubmissionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [mode, setMode] = useState<"upload" | "typed">("upload");
+  const [rows, setRows] = useState<ResultRow[]>([emptyRow(), emptyRow(), emptyRow()]);
+
   const [deadlineSetting, setDeadlineSetting] = useState<SubmissionSetting | null>(null);
   const { toast } = useToast();
 
