@@ -119,10 +119,21 @@ export default function ResultsSubmissionPage() {
       return;
     }
 
-    if (!selectedFile) {
+    const filledRows = rows.filter((r) => r.student_name.trim() !== "");
+
+    if (mode === "upload" && !selectedFile) {
       toast({
         title: "No file selected",
         description: "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (mode === "typed" && filledRows.length === 0) {
+      toast({
+        title: "No results entered",
+        description: "Add at least one student row before submitting",
         variant: "destructive",
       });
       return;
@@ -140,23 +151,31 @@ export default function ResultsSubmissionPage() {
     setIsSubmitting(true);
 
     try {
-      // Upload file to storage
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${formData.schoolName.replace(/\s+/g, '_')}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('result-submissions')
-        .upload(fileName, selectedFile);
+      let fileUrl: string | null = null;
+      let fileNameValue: string | null = null;
 
-      if (uploadError) throw uploadError;
+      if (mode === "upload" && selectedFile) {
+        // Upload file to storage
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${formData.schoolName.replace(/\s+/g, '_')}.${fileExt}`;
 
-      // Get file URL
-      const { data: urlData } = supabase.storage
-        .from('result-submissions')
-        .getPublicUrl(fileName);
+        const { error: uploadError } = await supabase.storage
+          .from('result-submissions')
+          .upload(fileName, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        // Get file URL
+        const { data: urlData } = supabase.storage
+          .from('result-submissions')
+          .getPublicUrl(fileName);
+
+        fileUrl = urlData.publicUrl;
+        fileNameValue = selectedFile.name;
+      }
 
       // Save submission record
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('result_submissions')
         .insert({
           school_name: formData.schoolName,
@@ -164,12 +183,33 @@ export default function ResultsSubmissionPage() {
           teacher_email: formData.teacherEmail || null,
           teacher_phone: formData.teacherPhone,
           series_number: parseInt(formData.seriesNumber),
-          file_url: urlData.publicUrl,
-          file_name: selectedFile.name,
+          file_url: fileUrl,
+          file_name: fileNameValue,
+          source: mode,
           notes: formData.notes || null,
-        });
+        })
+        .select('id')
+        .single();
 
       if (insertError) throw insertError;
+
+      if (mode === "typed" && inserted) {
+        const { error: rowsError } = await supabase
+          .from('result_submission_rows')
+          .insert(
+            filledRows.map((r, index) => ({
+              submission_id: inserted.id,
+              student_name: r.student_name.trim(),
+              subject: r.subject.trim() || null,
+              marks: r.marks === "" ? null : Number(r.marks),
+              grade: r.grade.trim() || gradeFor(r.marks) || null,
+              position: index + 1,
+            }))
+          );
+        if (rowsError) throw rowsError;
+      }
+
+
 
       setIsSuccess(true);
       toast({
