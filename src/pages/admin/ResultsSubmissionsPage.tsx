@@ -18,8 +18,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { FileSpreadsheet, Download, Loader2, Check, X, Clock, Trash2, ArrowUpDown } from "lucide-react";
+import { FileSpreadsheet, Download, Loader2, Check, X, Clock, Trash2, ArrowUpDown, Keyboard } from "lucide-react";
 import { format } from "date-fns";
+import { exportCombinedResults } from "@/lib/resultsExport";
 
 interface Submission {
   id: string;
@@ -28,8 +29,9 @@ interface Submission {
   teacher_email: string | null;
   teacher_phone: string;
   series_number: number;
-  file_url: string;
-  file_name: string;
+  file_url: string | null;
+  file_name: string | null;
+  source: string | null;
   notes: string | null;
   status: string;
   created_at: string;
@@ -41,6 +43,9 @@ export default function ResultsSubmissionsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sortDesc, setSortDesc] = useState(true);
+  const [exportSeries, setExportSeries] = useState<string>("all");
+  const [exportStatus, setExportStatus] = useState<string>("all");
+  const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -131,7 +136,7 @@ export default function ResultsSubmissionsPage() {
   const deleteSubmission = async (submission: Submission) => {
     setDeletingId(submission.id);
     try {
-      const parts = submission.file_url.split('/result-submissions/');
+      const parts = (submission.file_url || '').split('/result-submissions/');
       if (parts.length === 2) {
         await supabase.storage.from('result-submissions').remove([parts[1]]);
       }
@@ -153,6 +158,28 @@ export default function ResultsSubmissionsPage() {
       });
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const result = await exportCombinedResults(submissions as any, {
+        series: exportSeries === "all" ? "all" : Number(exportSeries),
+        status: exportStatus,
+      });
+      toast({
+        title: "Export ready",
+        description: `${result.submissions} submission(s), ${result.rows} result row(s) packed into one workbook`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Export failed",
+        description: error.message || "Could not build the combined workbook",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -210,10 +237,33 @@ export default function ResultsSubmissionsPage() {
                   Click on a file to download and review
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={() => setSortDesc(!sortDesc)}>
-                <ArrowUpDown className="h-4 w-4 mr-2" />
-                {sortDesc ? "Newest first" : "Oldest first"}
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select value={exportSeries} onValueChange={setExportSeries}>
+                  <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All series</SelectItem>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                      <SelectItem key={n} value={String(n)}>Series {n}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={exportStatus} onValueChange={setExportStatus}>
+                  <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="approved">Approved only</SelectItem>
+                    <SelectItem value="pending">Pending only</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" onClick={handleExport} disabled={isExporting || submissions.length === 0}>
+                  {isExporting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileSpreadsheet className="h-4 w-4 mr-2" />}
+                  Export combined XLS
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setSortDesc(!sortDesc)}>
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  {sortDesc ? "Newest first" : "Oldest first"}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -248,16 +298,21 @@ export default function ResultsSubmissionsPage() {
                         </TableCell>
                         <TableCell>Series {submission.series_number}</TableCell>
                         <TableCell>
-                          <button
-                            onClick={() => downloadFile(submission.file_url, submission.file_name)}
-                            className="text-primary hover:underline flex items-center gap-1"
-                          >
-                            <Download className="h-4 w-4" />
-                            {submission.file_name.length > 20 
-                              ? submission.file_name.substring(0, 20) + '...'
-                              : submission.file_name
-                            }
-                          </button>
+                          {submission.file_url && submission.file_name ? (
+                            <button
+                              onClick={() => downloadFile(submission.file_url!, submission.file_name!)}
+                              className="text-primary hover:underline flex items-center gap-1"
+                            >
+                              <Download className="h-4 w-4" />
+                              {submission.file_name.length > 20
+                                ? submission.file_name.substring(0, 20) + '...'
+                                : submission.file_name}
+                            </button>
+                          ) : (
+                            <span className="text-muted-foreground flex items-center gap-1 text-sm">
+                              <Keyboard className="h-4 w-4" /> Typed entry
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div>
