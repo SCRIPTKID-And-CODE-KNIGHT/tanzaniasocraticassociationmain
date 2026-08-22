@@ -18,8 +18,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { FileSpreadsheet, Download, Loader2, Check, X, Clock, Trash2, ArrowUpDown } from "lucide-react";
+import { FileSpreadsheet, Download, Loader2, Check, X, Clock, Trash2, ArrowUpDown, Keyboard } from "lucide-react";
 import { format } from "date-fns";
+import { exportCombinedResults } from "@/lib/resultsExport";
 
 interface Submission {
   id: string;
@@ -28,8 +29,9 @@ interface Submission {
   teacher_email: string | null;
   teacher_phone: string;
   series_number: number;
-  file_url: string;
-  file_name: string;
+  file_url: string | null;
+  file_name: string | null;
+  source: string | null;
   notes: string | null;
   status: string;
   created_at: string;
