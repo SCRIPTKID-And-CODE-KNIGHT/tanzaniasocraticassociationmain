@@ -73,6 +73,49 @@ export default function ResultsSubmissionPage() {
     notes: "",
   });
 
+  const addRow = () => setRows((prev) => [...prev, emptyRow()]);
+
+  const removeRow = (index: number) =>
+    setRows((prev) => (prev.length === 1 ? [emptyRow()] : prev.filter((_, i) => i !== index)));
+
+  const updateRow = (index: number, field: keyof ResultRow, value: string) => {
+    setRows((prev) =>
+      prev.map((row, i) => {
+        if (i !== index) return row;
+        const next = { ...row, [field]: value };
+        if (field === "marks") next.grade = gradeFor(value);
+        return next;
+      })
+    );
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
+    const text = e.clipboardData.getData("text/plain");
+    if (!text || !/[\t\n]/.test(text)) return;
+    e.preventDefault();
+    const parsed = text
+      .split(/\r?\n/)
+      .filter((line) => line.trim())
+      .map((line) => {
+        const [student_name = "", subject = "", marks = "", grade = ""] = line.split("\t");
+        const m = marks.trim();
+        return {
+          student_name: student_name.trim(),
+          subject: subject.trim(),
+          marks: m,
+          grade: grade.trim() || gradeFor(m),
+        };
+      });
+    if (parsed.length === 0) return;
+    setRows((prev) => {
+      const next = [...prev];
+      parsed.forEach((row, i) => {
+        next[index + i] = row;
+      });
+      return next;
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
