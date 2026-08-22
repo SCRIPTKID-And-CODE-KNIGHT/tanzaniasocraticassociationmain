@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, FileSpreadsheet, Loader2, CheckCircle, Plus, Trash2, Table2 } from "lucide-react";
+import { Upload, FileSpreadsheet, Loader2, CheckCircle, Plus, Trash2, Table2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import SubmissionDeadlineCountdown, { type SubmissionSetting } from "@/components/SubmissionDeadlineCountdown";
 
 interface ResultRow {
