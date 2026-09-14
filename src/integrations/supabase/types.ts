@@ -384,6 +384,30 @@ export type Database = {
           },
         ]
       }
+      participation_settings: {
+        Row: {
+          active_series_number: number
+          created_at: string
+          id: string
+          is_open: boolean
+          updated_at: string
+        }
+        Insert: {
+          active_series_number?: number
+          created_at?: string
+          id?: string
+          is_open?: boolean
+          updated_at?: string
+        }
+        Update: {
+          active_series_number?: number
+          created_at?: string
+          id?: string
+          is_open?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_status: {
         Row: {
           amount: number | null
