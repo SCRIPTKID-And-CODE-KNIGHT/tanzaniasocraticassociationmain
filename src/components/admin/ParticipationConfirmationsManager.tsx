@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -26,9 +28,45 @@ const ParticipationConfirmationsManager = () => {
   const [rows, setRows] = useState<ConfirmationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [seriesFilter, setSeriesFilter] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [clearAll, setClearAll] = useState(false);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [activeSeries, setActiveSeries] = useState<string>('1');
+  const [isOpen, setIsOpen] = useState(true);
+  const [savingSettings, setSavingSettings] = useState(false);
   const { toast } = useToast();
+
+  const fetchSettings = async () => {
+    const { data } = await supabase
+      .from('participation_settings')
+      .select('id, active_series_number, is_open')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (data) {
+      setSettingsId(data.id);
+      setActiveSeries(String(data.active_series_number));
+      setIsOpen(data.is_open);
+    }
+  };
+
+  const saveSettings = async (nextSeries: string, nextOpen: boolean) => {
+    setSavingSettings(true);
+    const payload = { active_series_number: parseInt(nextSeries), is_open: nextOpen };
+    const { data, error } = settingsId
+      ? await supabase.from('participation_settings').update(payload).eq('id', settingsId).select('id').maybeSingle()
+      : await supabase.from('participation_settings').insert(payload).select('id').maybeSingle();
+    setSavingSettings(false);
+    if (error) {
+      toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    if (data?.id) setSettingsId(data.id);
+    setActiveSeries(nextSeries);
+    setIsOpen(nextOpen);
+    toast({ title: 'Saved', description: `Schools now confirm for Series ${nextSeries}.` });
+  };
 
   const fetchRows = async () => {
     setLoading(true);
@@ -44,7 +82,7 @@ const ParticipationConfirmationsManager = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchRows(); }, []);
+  useEffect(() => { fetchRows(); fetchSettings(); }, []);
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from('participation_confirmations').delete().eq('id', id);
@@ -72,11 +110,13 @@ const ParticipationConfirmationsManager = () => {
 
   const filtered = rows.filter((r) => {
     const q = search.toLowerCase();
+    const matchesSeries = seriesFilter === 'all' || r.series_number === parseInt(seriesFilter);
     return (
-      !q ||
-      r.schools?.school_name?.toLowerCase().includes(q) ||
-      r.confirmed_by?.toLowerCase().includes(q) ||
-      r.schools?.region?.toLowerCase().includes(q)
+      matchesSeries &&
+      (!q ||
+        r.schools?.school_name?.toLowerCase().includes(q) ||
+        r.confirmed_by?.toLowerCase().includes(q) ||
+        r.schools?.region?.toLowerCase().includes(q))
     );
   });
 
@@ -105,14 +145,56 @@ const ParticipationConfirmationsManager = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search school, region or contact..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+        <div className="mb-6 rounded-lg border bg-muted/30 p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold mb-1">Series schools confirm for</p>
+              <p className="text-xs text-muted-foreground mb-2">
+                Schools only see this series on the confirmation page.
+              </p>
+              <Select value={activeSeries} onValueChange={(v) => saveSettings(v, isOpen)}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                    <SelectItem key={n} value={String(n)}>Series {n}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={isOpen}
+                disabled={savingSettings}
+                onCheckedChange={(v) => saveSettings(activeSeries, v)}
+              />
+              <span className="text-sm">{isOpen ? 'Confirmations open' : 'Confirmations closed'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4 flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search school, region or contact..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select value={seriesFilter} onValueChange={setSeriesFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All series</SelectItem>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <SelectItem key={n} value={String(n)}>Series {n}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="overflow-x-auto">
           <Table>

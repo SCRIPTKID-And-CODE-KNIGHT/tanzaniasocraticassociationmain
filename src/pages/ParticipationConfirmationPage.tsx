@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 const ParticipationConfirmationPage = () => {
   const [schools, setSchools] = useState<any[]>([]);
+  const [activeSeries, setActiveSeries] = useState<number>(1);
+  const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
     school_id: '',
     series_number: 1,
@@ -24,18 +26,37 @@ const ParticipationConfirmationPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchSchools();
+    init();
   }, []);
 
-  const fetchSchools = async () => {
+  const init = async () => {
+    const { data: settings } = await supabase
+      .from('participation_settings')
+      .select('active_series_number, is_open')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const series = settings?.active_series_number ?? 1;
+    setActiveSeries(series);
+    setIsOpen(settings?.is_open ?? true);
+    setFormData((prev) => ({ ...prev, series_number: series }));
+    fetchSchools(series);
+  };
+
+  const fetchSchools = async (series: number) => {
     try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('*')
-        .order('school_name');
+      const [{ data, error }, { data: confirmed }] = await Promise.all([
+        supabase.from('schools').select('*').order('school_name'),
+        supabase
+          .from('participation_confirmations')
+          .select('school_id')
+          .eq('series_number', series),
+      ]);
 
       if (error) throw error;
-      setSchools(data || []);
+      const done = new Set((confirmed || []).map((c: any) => c.school_id));
+      setSchools((data || []).filter((s: any) => !done.has(s.id)));
     } catch (error) {
       console.error('Error fetching schools:', error);
       toast({
@@ -53,6 +74,14 @@ const ParticipationConfirmationPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isOpen) {
+      toast({ title: 'Confirmations closed', description: 'Participation confirmation is currently closed.', variant: 'destructive' });
+      return;
+    }
+    if (!formData.school_id) {
+      toast({ title: 'Select your school', description: 'Please choose your school first.', variant: 'destructive' });
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -60,7 +89,7 @@ const ParticipationConfirmationPage = () => {
         .from('participation_confirmations')
         .insert({
           school_id: formData.school_id,
-          series_number: formData.series_number,
+          series_number: activeSeries,
           confirmed_by: formData.confirmed_by,
           number_of_students: formData.number_of_students ? parseInt(formData.number_of_students) : null,
           notes: formData.notes || null
@@ -74,6 +103,8 @@ const ParticipationConfirmationPage = () => {
       });
 
       setIsSubmitted(true);
+      setFormData((prev) => ({ ...prev, school_id: '' }));
+      fetchSchools(activeSeries);
     } catch (error: any) {
       console.error('Error confirming participation:', error);
       toast({
@@ -160,31 +191,17 @@ const ParticipationConfirmationPage = () => {
                 </Select>
                 {schools.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    No registered schools found. Please register your school first.
+                    Every registered school has already confirmed for Series {activeSeries}.
                   </p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="series_number">Series Number *</Label>
-                <Select 
-                  value={formData.series_number.toString()} 
-                  onValueChange={(value) => setFormData({...formData, series_number: parseInt(value)})}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Series 1 - July</SelectItem>
-                    <SelectItem value="2">Series 2 - August</SelectItem>
-                    <SelectItem value="3">Series 3 - September</SelectItem>
-                    <SelectItem value="4">Series 4 - October</SelectItem>
-                    <SelectItem value="5">Series 5</SelectItem>
-                    <SelectItem value="6">Series 6</SelectItem>
-                    <SelectItem value="7">Series 7</SelectItem>
-                    <SelectItem value="8">Series 8</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Series</Label>
+                <div className="mt-1 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm font-medium">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Series {activeSeries} — currently open for confirmation
+                </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -232,14 +249,22 @@ const ParticipationConfirmationPage = () => {
                 <School className="h-4 w-4" />
                 <AlertDescription>
                   By confirming participation, you acknowledge that your school will participate 
-                  in the selected series and agrees to follow all TASSA guidelines and requirements.
+                  in Series {activeSeries} and agrees to follow all TASSA guidelines and requirements.
                 </AlertDescription>
               </Alert>
+
+              {!isOpen && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    Participation confirmation is currently closed. Please check back later.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <Button 
                 type="submit" 
                 className="w-full btn-educational" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isOpen || schools.length === 0}
               >
                 {isSubmitting ? 'Confirming Participation...' : 'Confirm Participation'}
               </Button>
