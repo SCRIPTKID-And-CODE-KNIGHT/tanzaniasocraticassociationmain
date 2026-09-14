@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 const ParticipationConfirmationPage = () => {
   const [schools, setSchools] = useState<any[]>([]);
+  const [activeSeries, setActiveSeries] = useState<number>(1);
+  const [isOpen, setIsOpen] = useState(true);
   const [formData, setFormData] = useState({
     school_id: '',
     series_number: 1,
@@ -24,18 +26,37 @@ const ParticipationConfirmationPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchSchools();
+    init();
   }, []);
 
-  const fetchSchools = async () => {
+  const init = async () => {
+    const { data: settings } = await supabase
+      .from('participation_settings')
+      .select('active_series_number, is_open')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const series = settings?.active_series_number ?? 1;
+    setActiveSeries(series);
+    setIsOpen(settings?.is_open ?? true);
+    setFormData((prev) => ({ ...prev, series_number: series }));
+    fetchSchools(series);
+  };
+
+  const fetchSchools = async (series: number) => {
     try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('*')
-        .order('school_name');
+      const [{ data, error }, { data: confirmed }] = await Promise.all([
+        supabase.from('schools').select('*').order('school_name'),
+        supabase
+          .from('participation_confirmations')
+          .select('school_id')
+          .eq('series_number', series),
+      ]);
 
       if (error) throw error;
-      setSchools(data || []);
+      const done = new Set((confirmed || []).map((c: any) => c.school_id));
+      setSchools((data || []).filter((s: any) => !done.has(s.id)));
     } catch (error) {
       console.error('Error fetching schools:', error);
       toast({
