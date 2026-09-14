@@ -74,6 +74,14 @@ const ParticipationConfirmationPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isOpen) {
+      toast({ title: 'Confirmations closed', description: 'Participation confirmation is currently closed.', variant: 'destructive' });
+      return;
+    }
+    if (!formData.school_id) {
+      toast({ title: 'Select your school', description: 'Please choose your school first.', variant: 'destructive' });
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -81,7 +89,7 @@ const ParticipationConfirmationPage = () => {
         .from('participation_confirmations')
         .insert({
           school_id: formData.school_id,
-          series_number: formData.series_number,
+          series_number: activeSeries,
           confirmed_by: formData.confirmed_by,
           number_of_students: formData.number_of_students ? parseInt(formData.number_of_students) : null,
           notes: formData.notes || null
