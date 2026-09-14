@@ -103,6 +103,8 @@ const ParticipationConfirmationPage = () => {
       });
 
       setIsSubmitted(true);
+      setFormData((prev) => ({ ...prev, school_id: '' }));
+      fetchSchools(activeSeries);
     } catch (error: any) {
       console.error('Error confirming participation:', error);
       toast({
