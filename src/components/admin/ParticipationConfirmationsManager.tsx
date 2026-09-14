@@ -26,9 +26,45 @@ const ParticipationConfirmationsManager = () => {
   const [rows, setRows] = useState<ConfirmationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [seriesFilter, setSeriesFilter] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [clearAll, setClearAll] = useState(false);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [activeSeries, setActiveSeries] = useState<string>('1');
+  const [isOpen, setIsOpen] = useState(true);
+  const [savingSettings, setSavingSettings] = useState(false);
   const { toast } = useToast();
+
+  const fetchSettings = async () => {
+    const { data } = await supabase
+      .from('participation_settings')
+      .select('id, active_series_number, is_open')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (data) {
+      setSettingsId(data.id);
+      setActiveSeries(String(data.active_series_number));
+      setIsOpen(data.is_open);
+    }
+  };
+
+  const saveSettings = async (nextSeries: string, nextOpen: boolean) => {
+    setSavingSettings(true);
+    const payload = { active_series_number: parseInt(nextSeries), is_open: nextOpen };
+    const { data, error } = settingsId
+      ? await supabase.from('participation_settings').update(payload).eq('id', settingsId).select('id').maybeSingle()
+      : await supabase.from('participation_settings').insert(payload).select('id').maybeSingle();
+    setSavingSettings(false);
+    if (error) {
+      toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    if (data?.id) setSettingsId(data.id);
+    setActiveSeries(nextSeries);
+    setIsOpen(nextOpen);
+    toast({ title: 'Saved', description: `Schools now confirm for Series ${nextSeries}.` });
+  };
 
   const fetchRows = async () => {
     setLoading(true);
