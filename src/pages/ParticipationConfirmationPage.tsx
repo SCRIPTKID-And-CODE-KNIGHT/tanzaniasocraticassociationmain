@@ -249,14 +249,22 @@ const ParticipationConfirmationPage = () => {
                 <School className="h-4 w-4" />
                 <AlertDescription>
                   By confirming participation, you acknowledge that your school will participate 
-                  in the selected series and agrees to follow all TASSA guidelines and requirements.
+                  in Series {activeSeries} and agrees to follow all TASSA guidelines and requirements.
                 </AlertDescription>
               </Alert>
+
+              {!isOpen && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    Participation confirmation is currently closed. Please check back later.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <Button 
                 type="submit" 
                 className="w-full btn-educational" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isOpen || schools.length === 0}
               >
                 {isSubmitting ? 'Confirming Participation...' : 'Confirm Participation'}
               </Button>
