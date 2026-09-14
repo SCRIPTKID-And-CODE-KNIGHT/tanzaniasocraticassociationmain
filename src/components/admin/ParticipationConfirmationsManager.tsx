@@ -80,7 +80,7 @@ const ParticipationConfirmationsManager = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchRows(); }, []);
+  useEffect(() => { fetchRows(); fetchSettings(); }, []);
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from('participation_confirmations').delete().eq('id', id);
