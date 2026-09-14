@@ -108,11 +108,13 @@ const ParticipationConfirmationsManager = () => {
 
   const filtered = rows.filter((r) => {
     const q = search.toLowerCase();
+    const matchesSeries = seriesFilter === 'all' || r.series_number === parseInt(seriesFilter);
     return (
-      !q ||
-      r.schools?.school_name?.toLowerCase().includes(q) ||
-      r.confirmed_by?.toLowerCase().includes(q) ||
-      r.schools?.region?.toLowerCase().includes(q)
+      matchesSeries &&
+      (!q ||
+        r.schools?.school_name?.toLowerCase().includes(q) ||
+        r.confirmed_by?.toLowerCase().includes(q) ||
+        r.schools?.region?.toLowerCase().includes(q))
     );
   });
 
