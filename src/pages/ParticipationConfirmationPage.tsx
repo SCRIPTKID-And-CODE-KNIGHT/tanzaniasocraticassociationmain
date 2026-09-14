@@ -187,25 +187,11 @@ const ParticipationConfirmationPage = () => {
               </div>
 
               <div>
-                <Label htmlFor="series_number">Series Number *</Label>
-                <Select 
-                  value={formData.series_number.toString()} 
-                  onValueChange={(value) => setFormData({...formData, series_number: parseInt(value)})}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Series 1 - July</SelectItem>
-                    <SelectItem value="2">Series 2 - August</SelectItem>
-                    <SelectItem value="3">Series 3 - September</SelectItem>
-                    <SelectItem value="4">Series 4 - October</SelectItem>
-                    <SelectItem value="5">Series 5</SelectItem>
-                    <SelectItem value="6">Series 6</SelectItem>
-                    <SelectItem value="7">Series 7</SelectItem>
-                    <SelectItem value="8">Series 8</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Series</Label>
+                <div className="mt-1 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm font-medium">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Series {activeSeries} — currently open for confirmation
+                </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
