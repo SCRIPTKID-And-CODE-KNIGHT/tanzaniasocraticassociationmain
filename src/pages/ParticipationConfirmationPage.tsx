@@ -181,7 +181,7 @@ const ParticipationConfirmationPage = () => {
                 </Select>
                 {schools.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    No registered schools found. Please register your school first.
+                    Every registered school has already confirmed for Series {activeSeries}.
                   </p>
                 )}
               </div>
