@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, FileSpreadsheet, Loader2, CheckCircle, Plus, Trash2, Table2, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import SubmissionDeadlineCountdown, { type SubmissionSetting } from "@/components/SubmissionDeadlineCountdown";
+import { downloadResultTemplate } from "@/lib/resultTemplate";
+
 
 interface ResultRow {
   student_name: string;
@@ -74,23 +76,39 @@ export default function ResultsSubmissionPage() {
     notes: "",
   });
 
-  const downloadTemplate = () => {
-    const sheet = XLSX.utils.aoa_to_sheet([
-      ["Student Name", "Subject", "Marks", "Grade"],
-      ["Example: John Doe", "Geography", 82, "A"],
-      ["", "", "", ""],
-      ["", "", "", ""],
-      ["", "", "", ""],
-    ]);
-    sheet["!cols"] = [{ wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 10 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, sheet, "Results");
-    XLSX.writeFile(wb, "TASSA_Results_Template.xlsx");
+  const downloadTemplate = async () => {
+    const typedName = formData.schoolName.trim();
+    let studentCount = 50;
+    let averageDivisor = 2;
+    let matchedName = typedName;
+
+    if (typedName) {
+      const { data } = await supabase
+        .from("result_templates")
+        .select("school_name, student_count, average_divisor")
+        .ilike("school_name", `%${typedName}%`)
+        .limit(1)
+        .maybeSingle();
+      if (data) {
+        studentCount = data.student_count;
+        averageDivisor = Number(data.average_divisor);
+        matchedName = data.school_name;
+      }
+    }
+
+    downloadResultTemplate({
+      schoolName: matchedName,
+      studentCount,
+      averageDivisor,
+      seriesNumber: formData.seriesNumber || undefined,
+    });
+
     toast({
       title: "Template downloaded",
-      description: "Fill it in offline, then come back and upload it here.",
+      description: `${studentCount} student rows, average = Total ÷ ${averageDivisor}. Fill it in offline, then upload it here.`,
     });
   };
+
 
   const addRow = () => setRows((prev) => [...prev, emptyRow()]);
 

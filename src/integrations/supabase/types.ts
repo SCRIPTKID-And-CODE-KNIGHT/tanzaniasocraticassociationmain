@@ -553,6 +553,44 @@ export type Database = {
         }
         Relationships: []
       }
+      result_templates: {
+        Row: {
+          average_divisor: number
+          created_at: string
+          id: string
+          school_id: string | null
+          school_name: string
+          student_count: number
+          updated_at: string
+        }
+        Insert: {
+          average_divisor?: number
+          created_at?: string
+          id?: string
+          school_id?: string | null
+          school_name: string
+          student_count?: number
+          updated_at?: string
+        }
+        Update: {
+          average_divisor?: number
+          created_at?: string
+          id?: string
+          school_id?: string | null
+          school_name?: string
+          student_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "result_templates_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: true
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       results: {
         Row: {
           created_at: string
