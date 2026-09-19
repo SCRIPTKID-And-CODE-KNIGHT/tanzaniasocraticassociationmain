@@ -74,6 +74,24 @@ export default function ResultsSubmissionPage() {
     notes: "",
   });
 
+  const downloadTemplate = () => {
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ["Student Name", "Subject", "Marks", "Grade"],
+      ["Example: John Doe", "Geography", 82, "A"],
+      ["", "", "", ""],
+      ["", "", "", ""],
+      ["", "", "", ""],
+    ]);
+    sheet["!cols"] = [{ wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 10 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet, "Results");
+    XLSX.writeFile(wb, "TASSA_Results_Template.xlsx");
+    toast({
+      title: "Template downloaded",
+      description: "Fill it in offline, then come back and upload it here.",
+    });
+  };
+
   const addRow = () => setRows((prev) => [...prev, emptyRow()]);
 
   const removeRow = (index: number) =>
