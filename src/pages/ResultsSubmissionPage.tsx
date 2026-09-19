@@ -74,6 +74,24 @@ export default function ResultsSubmissionPage() {
     notes: "",
   });
 
+  const downloadTemplate = () => {
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ["Student Name", "Subject", "Marks", "Grade"],
+      ["Example: John Doe", "Geography", 82, "A"],
+      ["", "", "", ""],
+      ["", "", "", ""],
+      ["", "", "", ""],
+    ]);
+    sheet["!cols"] = [{ wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 10 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet, "Results");
+    XLSX.writeFile(wb, "TASSA_Results_Template.xlsx");
+    toast({
+      title: "Template downloaded",
+      description: "Fill it in offline, then come back and upload it here.",
+    });
+  };
+
   const addRow = () => setRows((prev) => [...prev, emptyRow()]);
 
   const removeRow = (index: number) =>
@@ -403,14 +421,25 @@ export default function ResultsSubmissionPage() {
               <Tabs value={mode} onValueChange={(v) => setMode(v as "upload" | "typed")}>
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="upload">
-                    <Upload className="h-4 w-4 mr-2" /> Upload file
+                    <Upload className="h-4 w-4 mr-2" /> Upload filled template
                   </TabsTrigger>
                   <TabsTrigger value="typed">
-                    <Table2 className="h-4 w-4 mr-2" /> Enter results
+                    <Table2 className="h-4 w-4 mr-2" /> Type results online
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="upload" className="space-y-2 mt-4">
+                <TabsContent value="upload" className="space-y-3 mt-4">
+                  <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-3">
+                    <p className="text-sm font-medium">Recommended for schools with slow internet</p>
+                    <ol className="text-sm text-muted-foreground list-decimal pl-5 space-y-1">
+                      <li>Download the results template below.</li>
+                      <li>Fill it in offline on any computer or phone.</li>
+                      <li>Come back and upload the filled file — one file per school.</li>
+                    </ol>
+                    <Button type="button" variant="outline" size="sm" onClick={downloadTemplate}>
+                      <Download className="h-4 w-4 mr-2" /> Download Excel template
+                    </Button>
+                  </div>
                   <Label htmlFor="file">Results File *</Label>
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
                     <input
