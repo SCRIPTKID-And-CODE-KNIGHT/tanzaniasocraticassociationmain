@@ -13,6 +13,8 @@ import { Switch } from '@/components/ui/switch';
 import { FileText, Plus, Edit, School, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ResultLinkField } from '@/components/admin/ResultLinkField';
+import { openResultFile } from '@/lib/resultFiles';
 
 interface GeneralResults {
   id: string;
@@ -48,7 +50,7 @@ const SchoolResultsManagementPage = () => {
   const { toast } = useToast();
 
   const [generalForm, setGeneralForm] = useState({
-    series_number: 6,
+    series_number: 3,
     general_results_url: '',
     top_ten_students_url: '',
     top_ten_schools_url: '',
@@ -57,7 +59,7 @@ const SchoolResultsManagementPage = () => {
 
   const [schoolForm, setSchoolForm] = useState({
     school_id: '',
-    series_number: 6,
+    series_number: 3,
     individual_results_url: '',
     is_published: false
   });
@@ -169,9 +171,14 @@ const SchoolResultsManagementPage = () => {
         if (error) throw error;
         toast({ title: "Success", description: "General results updated successfully" });
       } else {
-        const { error } = await supabase
+        const { data: existing } = await supabase
           .from('general_results')
-          .insert(resultData);
+          .select('id')
+          .eq('series_number', resultData.series_number)
+          .limit(1);
+        const { error } = existing && existing.length
+          ? await supabase.from('general_results').update(resultData).eq('id', existing[0].id)
+          : await supabase.from('general_results').insert(resultData);
 
         if (error) throw error;
         toast({ title: "Success", description: "General results added successfully" });
@@ -210,9 +217,17 @@ const SchoolResultsManagementPage = () => {
         if (error) throw error;
         toast({ title: "Success", description: "School results updated successfully" });
       } else {
-        const { error } = await supabase
+        if (!resultData.school_id) throw new Error('Please select a school');
+        if (!resultData.individual_results_url) throw new Error('Add a link or upload the results file');
+        const { data: existing } = await supabase
           .from('school_results')
-          .insert(resultData);
+          .select('id')
+          .eq('school_id', resultData.school_id)
+          .eq('series_number', resultData.series_number)
+          .limit(1);
+        const { error } = existing && existing.length
+          ? await supabase.from('school_results').update(resultData).eq('id', existing[0].id)
+          : await supabase.from('school_results').insert(resultData);
 
         if (error) throw error;
         toast({ title: "Success", description: "School results added successfully" });
@@ -281,7 +296,7 @@ const SchoolResultsManagementPage = () => {
 
   const resetGeneralForm = () => {
     setGeneralForm({
-      series_number: 6,
+      series_number: 3,
       general_results_url: '',
       top_ten_students_url: '',
       top_ten_schools_url: '',
@@ -292,7 +307,7 @@ const SchoolResultsManagementPage = () => {
   const resetSchoolForm = () => {
     setSchoolForm({
       school_id: '',
-      series_number: 6,
+      series_number: 3,
       individual_results_url: '',
       is_published: false
     });
@@ -389,21 +404,21 @@ const SchoolResultsManagementPage = () => {
                         <TableCell>Series {result.series_number}</TableCell>
                         <TableCell>
                           {result.general_results_url ? (
-                            <a href={result.general_results_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                            <a href="#" onClick={(e) => { e.preventDefault(); openResultFile(result.general_results_url).catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" })); }} className="text-primary hover:underline flex items-center gap-1">
                               Link <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : '-'}
                         </TableCell>
                         <TableCell>
                           {result.top_ten_students_url ? (
-                            <a href={result.top_ten_students_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                            <a href="#" onClick={(e) => { e.preventDefault(); openResultFile(result.top_ten_students_url).catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" })); }} className="text-primary hover:underline flex items-center gap-1">
                               Link <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : '-'}
                         </TableCell>
                         <TableCell>
                           {result.top_ten_schools_url ? (
-                            <a href={result.top_ten_schools_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                            <a href="#" onClick={(e) => { e.preventDefault(); openResultFile(result.top_ten_schools_url).catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" })); }} className="text-primary hover:underline flex items-center gap-1">
                               Link <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : '-'}
@@ -478,7 +493,7 @@ const SchoolResultsManagementPage = () => {
                         <TableCell>Series {result.series_number}</TableCell>
                         <TableCell>
                           {result.individual_results_url ? (
-                            <a href={result.individual_results_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                            <a href="#" onClick={(e) => { e.preventDefault(); openResultFile(result.individual_results_url).catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" })); }} className="text-primary hover:underline flex items-center gap-1">
                               Link <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : '-'}
@@ -537,39 +552,17 @@ const SchoolResultsManagementPage = () => {
                     <SelectItem value="4">Series 4</SelectItem>
                     <SelectItem value="5">Series 5</SelectItem>
                     <SelectItem value="6">Series 6</SelectItem>
+                    <SelectItem value="7">Series 7</SelectItem>
+                    <SelectItem value="8">Series 8</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="general_results_url">General Results URL</Label>
-                <Input
-                  id="general_results_url"
-                  value={generalForm.general_results_url}
-                  onChange={(e) => setGeneralForm({...generalForm, general_results_url: e.target.value})}
-                  placeholder="https://drive.google.com/..."
-                />
-              </div>
+              <ResultLinkField id="general_results_url" label="General Results" folder={`general/series-${generalForm.series_number}`} value={generalForm.general_results_url} onChange={(v) => setGeneralForm({...generalForm, general_results_url: v})} />
 
-              <div>
-                <Label htmlFor="top_ten_students_url">Top 10 Students URL</Label>
-                <Input
-                  id="top_ten_students_url"
-                  value={generalForm.top_ten_students_url}
-                  onChange={(e) => setGeneralForm({...generalForm, top_ten_students_url: e.target.value})}
-                  placeholder="https://drive.google.com/..."
-                />
-              </div>
+              <ResultLinkField id="top_ten_students_url" label="Top 10 Students" folder={`top-students/series-${generalForm.series_number}`} value={generalForm.top_ten_students_url} onChange={(v) => setGeneralForm({...generalForm, top_ten_students_url: v})} />
 
-              <div>
-                <Label htmlFor="top_ten_schools_url">Top 10 Schools URL</Label>
-                <Input
-                  id="top_ten_schools_url"
-                  value={generalForm.top_ten_schools_url}
-                  onChange={(e) => setGeneralForm({...generalForm, top_ten_schools_url: e.target.value})}
-                  placeholder="https://drive.google.com/..."
-                />
-              </div>
+              <ResultLinkField id="top_ten_schools_url" label="Top 10 Schools" folder={`top-schools/series-${generalForm.series_number}`} value={generalForm.top_ten_schools_url} onChange={(v) => setGeneralForm({...generalForm, top_ten_schools_url: v})} />
 
               <div className="flex items-center space-x-2">
                 <Switch
@@ -635,20 +628,13 @@ const SchoolResultsManagementPage = () => {
                     <SelectItem value="4">Series 4</SelectItem>
                     <SelectItem value="5">Series 5</SelectItem>
                     <SelectItem value="6">Series 6</SelectItem>
+                    <SelectItem value="7">Series 7</SelectItem>
+                    <SelectItem value="8">Series 8</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="individual_results_url">Individual Results URL *</Label>
-                <Input
-                  id="individual_results_url"
-                  value={schoolForm.individual_results_url}
-                  onChange={(e) => setSchoolForm({...schoolForm, individual_results_url: e.target.value})}
-                  placeholder="https://drive.google.com/..."
-                  required
-                />
-              </div>
+              <ResultLinkField id="individual_results_url" label="School Results (link or Excel file)" folder={`schools/series-${schoolForm.series_number}`} value={schoolForm.individual_results_url} onChange={(v) => setSchoolForm({...schoolForm, individual_results_url: v})} required />
 
               <div className="flex items-center space-x-2">
                 <Switch

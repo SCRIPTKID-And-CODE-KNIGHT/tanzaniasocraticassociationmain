@@ -37,6 +37,7 @@ import {
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { openResultFile } from '@/lib/resultFiles';
 
 interface GeneralResults {
   general_results_url: string | null;
@@ -92,6 +93,7 @@ const SchoolsResultsPage = () => {
   }, [currentSeries]);
 
   useEffect(() => {
+    setSchoolResult(null);
     if (selectedSchool) {
       fetchSchoolResult(selectedSchool);
     }
@@ -123,11 +125,13 @@ const SchoolsResultsPage = () => {
         .select('general_results_url, top_ten_students_url, top_ten_schools_url')
         .eq('series_number', currentSeries)
         .eq('is_published', true)
-        .maybeSingle();
+        .order('updated_at', { ascending: false })
+        .limit(1);
 
       if (error) throw error;
-      setGeneralResults(data);
+      setGeneralResults(data?.[0] ?? null);
     } catch (error) {
+      setGeneralResults(null);
       console.error('Error fetching general results:', error);
     }
   };
@@ -143,10 +147,11 @@ const SchoolsResultsPage = () => {
         .eq('school_id', schoolId)
         .eq('series_number', currentSeries)
         .eq('is_published', true)
-        .maybeSingle();
+        .order('updated_at', { ascending: false })
+        .limit(1);
 
       if (error) throw error;
-      setSchoolResult(data);
+      setSchoolResult((data?.[0] as SchoolResult) ?? null);
     } catch (error) {
       console.error('Error fetching school result:', error);
     }
@@ -286,12 +291,11 @@ const SchoolsResultsPage = () => {
                   <CardContent>
                     {item.url ? (
                       <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); openResultFile(item.url).catch(() => toast({ title: 'Unable to open', description: 'Please try again shortly.', variant: 'destructive' })); }}
                         className="inline-flex items-center text-primary font-medium hover:underline"
                       >
-                        Open document <ExternalLink className="h-4 w-4 ml-1" />
+                        Open / Download <ExternalLink className="h-4 w-4 ml-1" />
                       </a>
                     ) : (
                       <p className="text-sm text-muted-foreground">Not yet published</p>
@@ -385,9 +389,8 @@ const SchoolsResultsPage = () => {
                 <CardContent>
                   {schoolResult?.individual_results_url ? (
                     <a
-                      href={schoolResult.individual_results_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); openResultFile(schoolResult.individual_results_url).catch(() => toast({ title: 'Unable to open', description: 'Please try again shortly.', variant: 'destructive' })); }}
                       className="inline-flex items-center px-5 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow hover:opacity-90 transition"
                     >
                       Open School Results <ExternalLink className="h-4 w-4 ml-2" />
