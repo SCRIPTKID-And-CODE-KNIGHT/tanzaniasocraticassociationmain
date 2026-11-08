@@ -28,7 +28,7 @@ const HomePage = () => {
       setSchoolStatus(error ? 'error' : 'ready');
     });
   }, []);
-  const regions = Object.entries(schools.reduce<Record<string, typeof schools>>((acc, s) => { const r = s.region?.trim() || 'Other regions'; (acc[r] ||= []).push(s); return acc; }, {})).sort((a, b) => b[1].length - a[1].length);
+  const regions = Object.entries(schools.reduce<Record<string, typeof schools>>((acc, s) => { const raw = s.region?.trim().toLowerCase(); const r = raw ? raw.replace(/\b\w/g, c => c.toUpperCase()) : 'Other regions'; (acc[r] ||= []).push(s); return acc; }, {})).sort((a, b) => b[1].length - a[1].length);
 
   return <div className="bg-background">
     <TassaAI />
