@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, ArrowRight, ArrowUpRight, Building2, CalendarDays, School, CheckSquare } from 'lucide-react';
+import { BookOpen, FileText, ArrowRight, CalendarDays, School, CheckSquare } from 'lucide-react';
 import TassaAI from '@/components/TassaAI';
 import { Reveal } from '@/components/Reveal';
 import AchievementsSection from '@/components/AchievementsSection';
