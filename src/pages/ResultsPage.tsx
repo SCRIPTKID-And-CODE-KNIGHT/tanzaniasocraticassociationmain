@@ -38,6 +38,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { openResultFile } from '@/lib/resultFiles';
+import ExamBroadsheet from '@/components/results/ExamBroadsheet';
 
 interface GeneralResults {
   general_results_url: string | null;
@@ -388,13 +389,19 @@ const SchoolsResultsPage = () => {
                 </CardHeader>
                 <CardContent>
                   {schoolResult?.individual_results_url ? (
-                    <a
-                      href="#"
-                      onClick={(e) => { e.preventDefault(); openResultFile(schoolResult.individual_results_url).catch(() => toast({ title: 'Unable to open', description: 'Please try again shortly.', variant: 'destructive' })); }}
-                      className="inline-flex items-center px-5 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow hover:opacity-90 transition"
-                    >
-                      Open School Results <ExternalLink className="h-4 w-4 ml-2" />
-                    </a>
+                    (() => {
+                      const sc = schools.find((x) => x.id === selectedSchool);
+                      return (
+                        <ExamBroadsheet
+                          fileValue={schoolResult.individual_results_url}
+                          schoolName={schoolResult.schools?.school_name || sc?.school_name || ''}
+                          region={sc?.region}
+                          district={sc?.district}
+                          centreNo={sc?.registration_number || undefined}
+                          series={currentSeries}
+                        />
+                      );
+                    })()
                   ) : (
                     <p className="text-muted-foreground">Individual results for the selected school will be uploaded soon.</p>
                   )}
