@@ -48,8 +48,8 @@
     --shadow-md: 0 4px 14px -2px hsl(160 30% 10% / .08);
     --shadow-lg: 0 14px 30px -6px hsl(160 30% 10% / .12);
     --shadow-xl: 0 26px 52px -10px hsl(160 30% 10% / .16);
-    --font-heading: 'Roboto', system-ui, sans-serif;
-    --font-body: 'Roboto', system-ui, sans-serif;
+    --font-heading: 'Source Serif 4', Georgia, serif;
+    --font-body: 'Source Sans 3', system-ui, sans-serif;
     --sidebar-background: 160 30% 11%;
     --sidebar-foreground: 60 20% 96%;
     --sidebar-primary: 155 50% 65%;
